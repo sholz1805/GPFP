@@ -82,7 +82,7 @@ import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
 import { FaCheckCircle, FaEye, FaEyeSlash } from "react-icons/fa";
 import { signup } from "../../redux/actions/signUpActions";
-// import '../../input.css'
+import { Link } from "react-router-dom";
 
 const SignupDeveloper = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -112,42 +112,33 @@ const SignupDeveloper = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  let emailTimeout;
-  let phoneTimeout;
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+
+    setFormData((prevState) => ({
+      ...prevState,
       [name]: value,
-    });
+    }));
 
     if (name === "email") {
-      clearTimeout(emailTimeout);
-    }
-    if (name === "phone") {
-      clearTimeout(phoneTimeout);
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setEmailError(!emailRegex.test(value) ? "Invalid email address" : "");
     }
 
-    if (name === "password" || name === "confirmPassword") {
-      if (formData.password !== formData.confirmPassword) {
+    if (name === "phone") {
+      setPhoneError("");
+    }
+
+    if (name === "confirmPassword" || name === "password") {
+      if (
+        formData.password &&
+        formData.confirmPassword &&
+        formData.password !== formData.confirmPassword
+      ) {
         setPasswordError("Passwords do not match");
       } else {
         setPasswordError("");
       }
-    }
-
-    if (name === "email") {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (emailRegex.test(value)) {
-        setEmailError("");
-      } else {
-        setEmailError("Invalid email address");
-      }
-
-      emailTimeout = setTimeout(() => {
-        setEmailError("");
-      }, 5000);
     }
   };
 
@@ -159,51 +150,57 @@ const SignupDeveloper = () => {
 
     if (value) {
       const phoneRegex = /^[+][1-9]\d{1,14}$/;
-      if (phoneRegex.test(value)) {
-        setPhoneError("");
-      } else {
-        setPhoneError("Invalid phone number");
-      }
+      setPhoneError(!phoneRegex.test(value) ? "Invalid phone number" : "");
+    } else {
+      setPhoneError("Phone number is required");
+    }
+  };
+
+  const handleBlur = () => {
+    if (formData.password !== formData.confirmPassword) {
+      setPasswordError("Passwords do not match");
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      setPasswordError("Passwords do not match");
+      return;
+    } else {
+      setPasswordError("");
+    }
+
+    if (!formData.phoneNumber) {
+      setPhoneError("Phone number is required");
+      return;
+    }
+
+    const phoneRegex = /^[+][1-9]\d{1,14}$/;
+    if (!phoneRegex.test(formData.phoneNumber)) {
+      setPhoneError("Invalid phone number");
+      return;
     } else {
       setPhoneError("");
     }
 
-    phoneTimeout = setTimeout(() => {
-      setPhoneError("");
-    }, 5000);
-  };
-  
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  
-    if (formData.password !== formData.confirmPassword) {
-      setPasswordError("Passwords do not match");
-      return;
-    }
-  
     const realFormData = { ...formData };
     delete realFormData.confirmPassword;
-  
-    setPasswordError("");
-  
+
     dispatch(signup(realFormData))
       .then((response) => {
         if (response.type === "SIGNUP_SUCCESS") {
           setVerificationEmail(realFormData.email);
           setIsModalOpen(true);
-          
-          // setTimeout(() => {
-          //   window.location.href = "/verify-email";
-          // }, 3000);
         }
       })
       .catch((error) => {
         console.error("Signup failed", error);
       });
   };
-  
-  
 
   return (
     <div
@@ -315,6 +312,7 @@ const SignupDeveloper = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   placeholder="Password"
                   className="appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-xs md:text-sm text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
@@ -340,6 +338,7 @@ const SignupDeveloper = () => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   placeholder="Confirm"
                   className={`appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-xs md:text-sm text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                     passwordError ? "border-red-500" : ""
@@ -382,12 +381,12 @@ const SignupDeveloper = () => {
         <div className="mt-6 text-center">
           <p className="text-xs md:text-sm text-gray-700">
             Already have an account?{" "}
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="text-primary hover:text-secondary font-medium"
             >
               Sign In
-            </a>
+            </Link>
           </p>
         </div>
       </div>
@@ -397,9 +396,10 @@ const SignupDeveloper = () => {
             <div className="flex flex-col items-center">
               <FaCheckCircle className="text-green-500 text-4xl mb-3" />
               <p className="text-lg font-semibold">Verify Email</p>
-              <p className="text-gray-700 mt-2">
-                An email has been sent to {verificationEmail}. Please check your
-                inbox to verify your email address.
+              <p className="text-gray-500 mt-2 text-center leading-tight">
+                An email has been sent to{" "}
+                <span className="font-bold text-primary">{verificationEmail}</span>. Please
+                check your inbox to verify your email address.
               </p>
             </div>
           </div>

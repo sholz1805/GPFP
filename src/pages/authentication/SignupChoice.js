@@ -1,35 +1,3 @@
-// import React from 'react';
-// import { FaUser, FaBriefcase } from 'react-icons/fa';
-
-// const SignupChoice = () => {
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-gray-200">
-//       <div className="bg-white rounded-lg shadow-lg p-8 md:p-10 w-11/12 max-w-sm">
-        
-//         <div className="flex justify-center mb-8">
-//           <img src="/images/gpfpLogo.svg" alt="Logo" className="h-8 w-auto" />
-//         </div>
-        
-//         <div className="space-y-4">
-//           <button className="flex items-center justify-center w-full bg-[#467D9A] hover:bg-[#549BC2] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-//             <FaUser className="mr-2" />
-//             <span>Sign Up as a Developer</span>
-//           </button>
-          
-//           <button className="flex items-center justify-center w-full bg-[#467D9A] hover:bg-[#549BC2] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-//             <FaBriefcase className="mr-2" />
-//             <span>Sign Up as an Investor</span>
-//           </button>
-//         </div>
-        
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default SignupChoice;
-
-
 import React, { useState } from 'react';
 import { FaUser, FaBriefcase } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom'; 
