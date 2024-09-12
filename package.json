@@ -34,14 +34,12 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ],
-    "rules": {
-      "treatWarningsAsErrors": 1
-    }
-  },
+  "extends": [
+    "react-app",
+    "react-app/jest"
+  ]
+}
+,
   "browserslist": {
     "production": [
       ">0.2%",
