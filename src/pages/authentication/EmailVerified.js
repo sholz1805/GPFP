@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FaCheckCircle } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const EmailVerified = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const hasQuery = queryParams.get('token'); 
+
+  useEffect(() => {
+    if (!hasQuery) {
+      navigate('/error'); 
+    }
+  }, [hasQuery, navigate]);
 
   const handleLoginRedirect = () => {
-    navigate('/login'); 
+    navigate('/login');
   };
 
   return (

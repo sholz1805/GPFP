@@ -24,14 +24,14 @@ const Sidebar = () => {
     >
       <div>
         <div className="flex justify-between items-center mb-4 p-4">
-          <a href="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <img
               src="images/gpfpLogo.svg"
               alt="Logo"
               className={`h-6 ${isCollapsed ? "font-l" : "font-m"}`}
             />
             {!isCollapsed}
-          </a>
+          </Link>
           <button onClick={toggleSidebar} className="text-primary">
             {isCollapsed ? (
               <FaCaretRight size={16} />

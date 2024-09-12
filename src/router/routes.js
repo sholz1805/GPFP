@@ -7,6 +7,8 @@ import ForgotPassword from "../pages/authentication/ForgotPassword";
 import NewPasswordSetup from "../pages/authentication/NewPasswordSetup";
 import EmailVerified from "../pages/authentication/EmailVerified";
 import InvestorProfile from "../pages/authentication/investorProfile/InvestorProfile";
+import NotFound from "../pages/authentication/NotFound";
+import DummyDashboard from "../pages/authentication/DummyDashboard";
 
 const ROUTES = [
   {
@@ -62,6 +64,18 @@ const ROUTES = [
     key: "EmailVerified",
     exact: true,
     element: <EmailVerified />,
+  },
+  {
+    path: "/dashboard",
+    key: "Dashboard",
+    exact: true,
+    element: <DummyDashboard />,
+  },
+  {
+    path: "*",
+    key: "NotFound",
+    exact: true,
+    element: <NotFound />,
   },
 ];
 

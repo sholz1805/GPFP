@@ -6,7 +6,7 @@ import Sidebar from "../pages/dashboard/Sidebar";
 const DashboardRoutes = () => {
   return (
     <div className="flex h-screen">
-      <Sidebar /> {/* Dashboard Sidebar */}
+      <Sidebar />
       <main className="flex-1 p-4">
         <Routes>
           <Route path="/dashboard" element={<DeveloperDashboard />} />
