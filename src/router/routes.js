@@ -16,7 +16,7 @@ const ROUTES = [
     element: <Login />,
   },
   {
-    path: "/signup",
+    path: "/",
     key: "SignupChoice",
     exact: true,
     element: <SignupChoice />,
