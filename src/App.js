@@ -1,25 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import ROUTES from "./router/routes"; // Import non-dashboard routes
+import DashboardRoutes from "./router/DashboardRoutes"; // Import dashboard routes
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        {/* Non-Dashboard Routes */}
+        {ROUTES.map((route) => (
+          <Route
+            key={route.key}
+            path={route.path}
+            exact={route.exact}
+            element={route.element}
+          />
+        ))}
+
+        {/* Dashboard Routes */}
+        <Route path="/*" element={<DashboardRoutes />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;

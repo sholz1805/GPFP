@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    @apply m-0 p-0 box-border;
+  }
+
+.scroll-container {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.scroll-container::-webkit-scrollbar {
+    display: block;
+    height: 10px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+    background: rgba(74, 93, 88, 0.50);
+}
+
+.custom-scroll-bar::-webkit-scrollbar {
+    background: transparent !important;
+    width: 10px;
+    height: 8px;
+}
+
+.custom-scroll-bar::-webkit-scrollbar-thumb {
+    background: #eaecf0 !important;
+    max-height: 20px !important;
+    border-radius: 32px;
+}
+
+  
+  
+  
