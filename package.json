@@ -33,18 +33,15 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  
-    "eslintConfig": {
-      "extends": [
-        "react-app",
-        "react-app/jest"
-      ],
-      "rules": {
-        "treatWarningsAsErrors": false
-      }
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "rules": {
+      "treatWarningsAsErrors": 1
     }
-  ,
-  
+  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -58,6 +55,12 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15"
+  },
+  "babel": {
+    "plugins": [
+      "@babel/plugin-proposal-private-property-in-object"
+    ]
   }
 }
