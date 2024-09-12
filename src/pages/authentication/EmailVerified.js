@@ -12,26 +12,28 @@ const EmailVerified = () => {
 
   useEffect(() => {
     if (!token) {
-      navigate('*');
+      navigate('*');  
       return;
     }
 
     const verifyEmail = async () => {
       try {
-        const response = await axios.post('https://greenpower-stage-71fa5ec0b66d.herokuapp.com/auth/verify-email', { token });
-     
-        setVerificationStatus('success');
+        
+        const response = await axios.get(
+          `https://greenpower-stage-71fa5ec0b66d.herokuapp.com/auth/verify-email?token=${token}`
+        );
+        
+        setVerificationStatus('success'); 
       } catch (error) {
-       
-        setVerificationStatus('failure');
+        setVerificationStatus('failure'); 
       }
     };
 
-    verifyEmail(); 
+    verifyEmail();  
   }, [token, navigate]);
 
   const handleLoginRedirect = () => {
-    navigate('/login');
+    navigate('/login'); 
   };
 
   return (
@@ -60,7 +62,7 @@ const EmailVerified = () => {
             </p>
           </>
         ) : (
-          <p className="text-gray-600 mb-6">Verifying your email...</p> /
+          <p className="text-gray-600 mb-6">Verifying your email...</p>
         )}
       </div>
     </div>
