@@ -7,30 +7,33 @@ const EmailVerified = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const token = queryParams.get('token'); 
+  const code = queryParams.get('code'); 
   const [verificationStatus, setVerificationStatus] = useState(null); 
 
   useEffect(() => {
-    if (!token) {
+    if (!code) {
       navigate('*');  
       return;
     }
-
+  
     const verifyEmail = async () => {
       try {
+        const response = await axios.get(`https://greenpower-stage-71fa5ec0b66d.herokuapp.com/auth/verify-email?code=${code}`);
         
-        const response = await axios.get(
-          `https://greenpower-stage-71fa5ec0b66d.herokuapp.com/auth/verify-email?token=${token}`
-        );
-        
-        setVerificationStatus('success'); 
+        if (response.data.success) {
+          setVerificationStatus('success');
+        } else {
+          setVerificationStatus('failure');
+        }
       } catch (error) {
+        console.error('Verification error:', error);
         setVerificationStatus('failure'); 
       }
     };
-
-    verifyEmail();  
-  }, [token, navigate]);
+  
+    verifyEmail();
+  }, [code, navigate]);
+  
 
   const handleLoginRedirect = () => {
     navigate('/login'); 
