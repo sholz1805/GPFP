@@ -16,15 +16,15 @@ export const signinFailure = (error) => ({
   payload: error,
 });
 
-export const signin = (userData, authToken) => {
+export const signin = (userData) => {
   const baseUrl = 'https://greenpower-stage-71fa5ec0b66d.herokuapp.com';
   
  
   const config = {
-    headers: {
-      'Content-Type': 'application/json', 
-      'Authorization': `Bearer ${authToken}`, 
-    },
+    // headers: {
+    //   'Content-Type': 'application/json', 
+    //   'Authorization': `Bearer ${authToken}`, 
+    // },
   };
   
   return async (dispatch) => {

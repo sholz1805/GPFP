@@ -60,7 +60,7 @@ const ROUTES = [
     element: <NewPasswordSetup />,
   },
   {
-    path: "/email-verified",
+    path: "/auth/verify-email",
     key: "EmailVerified",
     exact: true,
     element: <EmailVerified />,
