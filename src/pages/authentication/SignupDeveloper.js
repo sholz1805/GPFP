@@ -83,6 +83,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { FaCheckCircle, FaEye, FaEyeSlash } from "react-icons/fa";
 import { signup } from "../../redux/actions/signUpActions";
 import { Link } from "react-router-dom";
+import './phoneNumber.css'
 
 const SignupDeveloper = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -129,12 +130,11 @@ const SignupDeveloper = () => {
       setPhoneError("");
     }
 
-    if (name === "confirmPassword" || name === "password") {
-      if (
-        formData.password &&
-        formData.confirmPassword &&
-        formData.password !== formData.confirmPassword
-      ) {
+    if (name === "password" || name === "confirmPassword") {
+      // Immediately validate and clear the error if the passwords match
+      if (formData.password !== value && name === "confirmPassword") {
+        setPasswordError("Passwords do not match");
+      } else if (formData.confirmPassword !== value && name === "password") {
         setPasswordError("Passwords do not match");
       } else {
         setPasswordError("");
@@ -284,13 +284,13 @@ const SignupDeveloper = () => {
                 Phone Number
               </label>
               <PhoneInput
-                style={{ outline: "transparent" }}
                 international
                 defaultCountry="NG"
                 value={formData.phoneNumber}
                 onChange={handlePhoneChange}
-                className="appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-xs md:text-sm text-gray-700 leading-tight outline-transparent focus:outline-transparent"
+                className="appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-xs md:text-sm text-gray-700 leading-tight focus:outline-none focus:ring-0 custom-phone-input"
               />
+
               {phoneError && (
                 <p className="text-red-500 text-xs italic mt-1">{phoneError}</p>
               )}
@@ -398,8 +398,10 @@ const SignupDeveloper = () => {
               <p className="text-lg font-semibold">Verify Email</p>
               <p className="text-gray-500 mt-2 text-center leading-tight">
                 An email has been sent to{" "}
-                <span className="font-bold text-primary">{verificationEmail}</span>. Please
-                check your inbox to verify your email address.
+                <span className="font-bold text-primary">
+                  {verificationEmail}
+                </span>
+                . Please check your inbox to verify your email address.
               </p>
             </div>
           </div>

@@ -18,7 +18,11 @@ const EmailVerified = () => {
   
     const verifyEmail = async () => {
       try {
-        const response = await axios.get(`https://greenpower-stage-71fa5ec0b66d.herokuapp.com/auth/verify-email?code=${code}`);
+        const response = await axios.get(`https://greenpower-stage-71fa5ec0b66d.herokuapp.com/auth/verify-email?code=${encodeURIComponent(code)}`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
         
         if (response.data.success) {
           setVerificationStatus('success');

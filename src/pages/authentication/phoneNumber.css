@@ -1,0 +1,16 @@
+.custom-phone-input input {
+    outline: none;
+    box-shadow: none;
+    padding-right: 0px; 
+    width: 80%;
+  }
+  
+  .custom-phone-input .PhoneInputCountry {
+    margin-right: 0px; 
+    margin: 0;
+  }
+  
+  .custom-phone-input .PhoneInputInput {
+    padding-left: 0px; 
+  }
+  
