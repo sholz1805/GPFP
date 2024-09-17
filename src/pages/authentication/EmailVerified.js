@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const EmailVerified = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const code = queryParams.get('code'); 
-  const [verificationStatus, setVerificationStatus] = useState(null); 
+  const { code } = useParams(); 
+  const [verificationStatus, setVerificationStatus] = useState(null);
 
   useEffect(() => {
     if (!code) {
@@ -18,7 +16,7 @@ const EmailVerified = () => {
   
     const verifyEmail = async () => {
       try {
-        const response = await axios.get(`https://greenpower-stage-71fa5ec0b66d.herokuapp.com/auth/verify-email?code=${encodeURIComponent(code)}`, {
+        const response = await axios.get(`https://greenpower-stage-71fa5ec0b66d.herokuapp.com/auth/verify-email/${code}`, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -42,6 +40,7 @@ const EmailVerified = () => {
   const handleLoginRedirect = () => {
     navigate('/login'); 
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">

@@ -6,31 +6,27 @@ import {
   AiOutlineCloudUpload,
 } from "react-icons/ai";
 import {
-  Modal,
   TextField,
   Button,
   Checkbox,
   FormControlLabel,
-  FormGroup,
   MenuItem,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-
-const StyledModal = styled(Modal)({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-});
-
-const ModalContent = styled("div")({
-  backgroundColor: "white",
-  padding: "20px",
-  borderRadius: "8px",
-  width: "80%",
-  maxWidth: "600px",
-  maxHeight: "85vh",
-  overflowY: "auto",
-});
+import CloudinaryUpload from "../../../redux/CloudinaryUpload";
+import { toast } from "react-toastify";
+import ProfileModal from "./ProfileModal";
+import ResponseModal from "../ResponseModal";
+import {
+  createProfile,
+  fetchProfile,
+} from "../../../redux/actions/profileActions";
+import { useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import InfoModal from "../InfoModal";
+/* eslint no-unused-vars: 0 */
 
 const ReadOnlyTextField = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -47,85 +43,148 @@ const ReadOnlyTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-function DeveloperProfile() {
+const ReadOnlyTextFieldComponent = ({
+  label,
+  value,
+  onChange,
+  onEdit,
+  ...props
+}) => {
+  return (
+    <TextField
+      fullWidth
+      label={label}
+      variant="standard"
+      value={value}
+      onChange={onChange}
+      margin="normal"
+      InputProps={{
+        endAdornment: (
+          <Button onClick={onEdit} className="absolute right">
+            <AiOutlineEdit />
+          </Button>
+        ),
+        readOnly: true,
+        style: {
+          cursor: "not-allowed",
+        },
+      }}
+      {...props}
+    />
+  );
+};
+
+const DeveloperProfile = () => {
+  const [open, setOpen] = useState(false);
   const [profileImage, setProfileImage] = useState("");
-  const [representativeName, setRepresentativeName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [address, setAddress] = useState("");
-  const [email, setEmail] = useState("");
-  const [yearsOfOperation, setYearsOfOperation] = useState("");
-  const [noOfProjects, setNoOfProjects] = useState("");
-  const [companyHousing, setCompanyHousing] = useState("");
-  const [companyWeb, setCompanyWeb] = useState("");
-  const [executedGrantProject, setExecutedGrantProject] = useState("");
-  const [focusAreas, setFocusAreas] = useState([]);
+  const [representativeEmail, setRepresentativeEmail] = useState("");
+  const [representativeName, setRepresentativeName] = useState("");
+  const [operationYears, setOperationYears] = useState(0);
+  const [projectsCount, setProjectsCount] = useState(0);
+  const [houseNumber, setHouseNumber] = useState(0);
+  const [companyWebsite, setCompanyWebsite] = useState("");
   const [briefAboutCompany, setBriefAboutCompany] = useState("");
+  const [focusAreas, setFocusAreas] = useState([]);
+  const [previousGrant, setPreviousGrant] = useState("");
+  const [directorFile, setDirectorFile] = useState("");
+  const [cacFile, setCacFile] = useState("");
+  const [memartFile, setMemartFile] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [open, setOpen] = useState(false);
   const [editField, setEditField] = useState("");
-  const [directorFile, setDirectorFile] = useState(null);
-  const [cacFile, setCacFile] = useState(null);
-  const [memartFile, setMemartFile] = useState(null);
+  const [profile, setProfile] = useState({});
+
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [responseModalOpen, setResponseModalOpen] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+
+  const dispatch = useDispatch();
+
+  const location = useLocation();
+  const userId = location.state.userId;
+  const token = location.state.token;
+  console.log(token);
 
   const inputRefs = {
     representativeName: useRef(null),
     companyName: useRef(null),
     address: useRef(null),
-    email: useRef(null),
-    yearsOfOperation: useRef(null),
-    noOfProjects: useRef(null),
-    companyHousing: useRef(null),
-    companyWeb: useRef(null),
-    executedGrantProject: useRef(null),
+    representativeEmail: useRef(null),
+    operationYears: useRef(null),
+    projectsCount: useRef(null),
+    houseNumber: useRef(null),
+    companyWebsite: useRef(null),
+    previousGrant: useRef(null),
     briefAboutCompany: useRef(null),
   };
 
   useEffect(() => {
-    const savedProfileImage = localStorage.getItem("profileImage");
-    const savedRepresentativeName = localStorage.getItem("representativeName");
-    const savedCompanyName = localStorage.getItem("companyName");
-    const savedAddress = localStorage.getItem("address");
-    const savedEmail = localStorage.getItem("email");
-    const savedYearsOfOperation = localStorage.getItem("yearsOfOperation");
-    const savedNoOfProjects = localStorage.getItem("noOfProjects");
-    const savedCompanyHousing = localStorage.getItem("companyHousing");
-    const savedCompanyWeb = localStorage.getItem("companyWeb");
-    const savedExecutedGrantProject = localStorage.getItem(
-      "executedGrantProject"
-    );
-    const savedFocusAreas = localStorage.getItem("focusAreas");
-    const savedBriefAboutCompany = localStorage.getItem("briefAboutCompany");
+    if (
+      location.state &&
+      location.state.userId !== null &&
+      location.state.userId !== undefined
+    ) {
+      const fetchUserProfile = async (userId) => {
+        try {
+          const userProfile = await dispatch(fetchProfile(userId, token));
+          const fetchedUserProfile = userProfile.data.data;
 
-    if (savedProfileImage) setProfileImage(savedProfileImage);
-    if (savedRepresentativeName) setRepresentativeName(savedRepresentativeName);
-    if (savedCompanyName) setCompanyName(savedCompanyName);
-    if (savedAddress) setAddress(savedAddress);
-    if (savedEmail) setEmail(savedEmail);
-    if (savedYearsOfOperation) setYearsOfOperation(savedYearsOfOperation);
-    if (savedNoOfProjects) setNoOfProjects(savedNoOfProjects);
-    if (savedCompanyHousing) setCompanyHousing(savedCompanyHousing);
-    if (savedCompanyWeb) setCompanyWeb(savedCompanyWeb);
-    if (savedExecutedGrantProject)
-      setExecutedGrantProject(savedExecutedGrantProject);
-    if (savedFocusAreas) setFocusAreas(JSON.parse(savedFocusAreas));
-    if (savedBriefAboutCompany) setBriefAboutCompany(savedBriefAboutCompany);
-  }, []);
+          // Check if there's any error in the fetched profile data
+          if (fetchedUserProfile && fetchedUserProfile.error) {
+            setProfileModalOpen(true);
+            return;
+          }
 
-  const handleImageUpload = (e) => {
+          if (fetchedUserProfile) {
+            setProfile(fetchedUserProfile);
+            console.log(fetchedUserProfile);
+
+            setCompanyName(fetchedUserProfile.companyName);
+            setAddress(fetchedUserProfile.address);
+            setRepresentativeEmail(fetchedUserProfile.representativeEmail);
+            setRepresentativeName(fetchedUserProfile.representativeName);
+            setOperationYears(parseInt(fetchedUserProfile.operationYears, 10) || 0);
+            setProjectsCount(parseInt(fetchedUserProfile.projectsCount, 10) || 0);
+            setHouseNumber(parseInt(fetchedUserProfile.houseNumber, 10) || 0);
+            setCompanyWebsite(fetchedUserProfile.companyWebsite);
+            setBriefAboutCompany(fetchedUserProfile.briefAboutCompany);
+            setFocusAreas(fetchedUserProfile.focusAreas);
+            setPreviousGrant(fetchedUserProfile.previousGrant);
+            setDirectorFile(fetchedUserProfile.directorFile);
+            setCacFile(fetchedUserProfile.cacFile);
+            setMemartFile(fetchedUserProfile.memartFile);
+            setProfileImage(fetchedUserProfile.profileImage);
+          } else {
+            setProfileModalOpen(true);
+          }
+        } catch (error) {
+          if (error.response && error.response.status === 401) {
+            setProfileModalOpen(true);
+          } else {
+            console.error("Error fetching profile", error);
+            setProfileModalOpen(true);
+          }
+        }
+      };
+      fetchUserProfile(location.state.userId);
+    } else {
+      setProfileModalOpen(true);
+    }
+  }, [dispatch, location.state]);
+
+  const handleImageUpload = async (e) => {
     const file = e.target.files ? e.target.files[0] : null;
     if (file) {
       setIsLoading(true);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result);
-        localStorage.setItem("profileImage", reader.result);
+      try {
+        const response = await CloudinaryUpload(file, "profile_images");
+        setProfileImage(response.secure_url);
         setIsLoading(false);
-      };
-      reader.onerror = () => {
-        console.error("Error reading file");
+      } catch (error) {
+        console.error("Error uploading profile image to Cloudinary", error);
         setIsLoading(false);
-      };
-      reader.readAsDataURL(file);
+      }
     } else {
       console.error("No file selected or file input is undefined");
     }
@@ -133,21 +192,10 @@ function DeveloperProfile() {
 
   const handleRemoveImage = () => {
     setProfileImage("");
-    localStorage.removeItem("profileImage");
   };
 
   const handleSave = () => {
-    localStorage.setItem("representativeName", representativeName);
-    localStorage.setItem("companyName", companyName);
-    localStorage.setItem("address", address);
-    localStorage.setItem("email", email);
-    localStorage.setItem("yearsOfOperation", yearsOfOperation);
-    localStorage.setItem("noOfProjects", noOfProjects);
-    localStorage.setItem("companyHousing", companyHousing);
-    localStorage.setItem("companyWeb", companyWeb);
-    localStorage.setItem("executedGrantProject", executedGrantProject);
-    localStorage.setItem("focusAreas", JSON.stringify(focusAreas));
-    localStorage.setItem("briefAboutCompany", briefAboutCompany);
+    handleCreateProfile();
     setOpen(false);
   };
 
@@ -168,32 +216,56 @@ function DeveloperProfile() {
     );
   };
 
-  const saveToLocalStorage = (key, value) => {
-    localStorage.setItem(key, JSON.stringify(value));
-  };
-
-  useEffect(() => {
-    setDirectorFile(getFromLocalStorage("directorFile"));
-    setCacFile(getFromLocalStorage("cacFile"));
-    setMemartFile(getFromLocalStorage("memartFile"));
-  }, []);
-
-  const handleFileUpload = (event, setFileState, key) => {
+  const handleFileUpload = async (event, setFileState, folder) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const fileData = reader.result;
-        setFileState(fileData);
-        saveToLocalStorage(key, fileData);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const response = await CloudinaryUpload(file, folder);
+        setFileState(response.secure_url);
+      } catch (error) {
+        console.error("Error uploading file to Cloudinary", error);
+        toast.error("Error uploading file. Please try again.");
+      }
     }
   };
 
-  const getFromLocalStorage = (key) => {
-    const value = localStorage.getItem(key);
-    return value ? JSON.parse(value) : null;
+  const handleCreateProfile = async () => {
+    try {
+      const profileData = {
+        uniqueId: userId,
+        companyAddress: address,
+        houseNumber: parseInt(houseNumber, 10),
+        companyWebsite,
+        representativeName,
+        representativeEmail,
+        operationYears: parseInt(operationYears, 10),
+        projectsCount: parseInt(projectsCount, 10),
+        grantQualified: 21.0,
+        previousGrant,
+        // executionType: [],
+        // projectType: [],
+        // equipmentSupply: [],
+        focusArea: focusAreas,
+        developerProfilePicture: profileImage,
+        companyDirectors: directorFile,
+        companyCertificate: cacFile,
+        companyMemart: memartFile,
+      };
+      console.log("profileData:", profileData);
+
+      const response = await dispatch(createProfile(profileData, token));
+      const newProfile = response.data.data;
+      console.log(newProfile);
+
+      setProfile(newProfile);
+
+      setResponseMessage("Profile created successfully!");
+      setResponseModalOpen(true);
+    } catch (error) {
+      console.error(" Error creating profile", error);
+      setResponseMessage(`Error creating profile: ${error.message}`);
+      setResponseModalOpen(true);
+    }
   };
 
   return (
@@ -263,204 +335,90 @@ function DeveloperProfile() {
           <div className="space-y-4">
             <div className="flex flex-col lg:flex-row lg:gap-4">
               <div className="relative w-full">
-                <ReadOnlyTextField
-                  fullWidth
+                <ReadOnlyTextFieldComponent
                   label="Company's Name"
-                  variant="outlined"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
-                  margin="normal"
-                  InputProps={{
-                    endAdornment: (
-                      <Button
-                        onClick={() => handleEdit("companyName")}
-                        className="absolute right"
-                      >
-                        <AiOutlineEdit />
-                      </Button>
-                    ),
-                    readOnly: true,
-                  }}
+                  onEdit={() => handleEdit("companyName")}
                 />
               </div>
             </div>
 
             <div className="relative">
-              <ReadOnlyTextField
-                fullWidth
+              <ReadOnlyTextFieldComponent
                 label="Address"
-                variant="outlined"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                margin="normal"
-                InputProps={{
-                  endAdornment: (
-                    <Button
-                      onClick={() => handleEdit("address")}
-                      className="absolute right"
-                    >
-                      <AiOutlineEdit />
-                    </Button>
-                  ),
-                  readOnly: true,
-                }}
+                onEdit={() => handleEdit("address")}
               />
             </div>
 
             <div className="relative">
-              <ReadOnlyTextField
-                fullWidth
+              <ReadOnlyTextFieldComponent
                 label="Email"
-                variant="outlined"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                margin="normal"
-                InputProps={{
-                  endAdornment: (
-                    <Button
-                      onClick={() => handleEdit("email")}
-                      className="absolute right"
-                    >
-                      <AiOutlineEdit />
-                    </Button>
-                  ),
-                  readOnly: true,
-                }}
+                value={representativeEmail}
+                onChange={(e) => setRepresentativeEmail(e.target.value)}
+                onEdit={() => handleEdit("representativeEmail")}
               />
             </div>
             <div className="relative">
-              <ReadOnlyTextField
-                fullWidth
+              <ReadOnlyTextFieldComponent
                 label="Representative's Name"
-                variant="outlined"
                 value={representativeName}
                 onChange={(e) => setRepresentativeName(e.target.value)}
-                margin="normal"
-                InputProps={{
-                  endAdornment: (
-                    <Button
-                      onClick={() => handleEdit("representativeName")}
-                      className="absolute right"
-                    >
-                      <AiOutlineEdit />
-                    </Button>
-                  ),
-                  readOnly: true,
-                }}
+                onEdit={() => handleEdit("representativeName")}
               />
             </div>
 
             <div className="flex flex-col lg:flex-row lg:gap-4">
               <div className="relative w-full">
-                <ReadOnlyTextField
-                  fullWidth
+                <ReadOnlyTextFieldComponent
                   label="Years of Operation"
-                  variant="outlined"
-                  value={yearsOfOperation}
-                  onChange={(e) => setYearsOfOperation(e.target.value)}
-                  margin="normal"
-                  InputProps={{
-                    endAdornment: (
-                      <Button
-                        onClick={() => handleEdit("yearsOfOperation")}
-                        className="absolute right"
-                      >
-                        <AiOutlineEdit />
-                      </Button>
-                    ),
-                    readOnly: true,
-                  }}
+                  value={Number(operationYears)}
+                  onChange={(e) => setOperationYears(parseInt(e.target.value))}
+                  onEdit={() => handleEdit("operationYears")}
+                  type="number"
                 />
               </div>
               <div className="relative w-full">
-                <ReadOnlyTextField
-                  fullWidth
+                <ReadOnlyTextFieldComponent
                   label="Number of Projects"
-                  variant="outlined"
-                  value={noOfProjects}
-                  onChange={(e) => setNoOfProjects(e.target.value)}
-                  margin="normal"
-                  InputProps={{
-                    endAdornment: (
-                      <Button
-                        onClick={() => handleEdit("noOfProjects")}
-                        className="absolute right"
-                      >
-                        <AiOutlineEdit />
-                      </Button>
-                    ),
-                    readOnly: true,
-                  }}
+                  value={Number(projectsCount)}
+                  onChange={(e) => setProjectsCount(parseInt(e.target.value))}
+                  onEdit={() => handleEdit("projectsCount")}
+                  type="number"
                 />
               </div>
             </div>
 
             <div className="flex flex-col lg:flex-row lg:gap-4">
               <div className="relative w-full">
-                <ReadOnlyTextField
-                  fullWidth
+                <ReadOnlyTextFieldComponent
                   label="Company Housing Number"
-                  variant="outlined"
-                  value={companyHousing}
-                  onChange={(e) => setCompanyHousing(e.target.value)}
-                  margin="normal"
-                  InputProps={{
-                    endAdornment: (
-                      <Button
-                        onClick={() => handleEdit("companyHousing")}
-                        className="absolute right"
-                      >
-                        <AiOutlineEdit />
-                      </Button>
-                    ),
-                    readOnly: true,
-                  }}
+                  value={Number(houseNumber)}
+                  onChange={(e) => setHouseNumber(parseInt(e.target.value))}
+                  onEdit={() => handleEdit("houseNumber")}
+                  type="number"
                 />
               </div>
               <div className="relative w-full">
-                <ReadOnlyTextField
-                  fullWidth
-                  label="Company's Website's link"
-                  variant="outlined"
-                  value={companyWeb}
-                  onChange={(e) => setCompanyWeb(e.target.value)}
-                  margin="normal"
-                  InputProps={{
-                    endAdornment: (
-                      <Button
-                        onClick={() => handleEdit("companyWeb")}
-                        className="absolute right"
-                      >
-                        <AiOutlineEdit />
-                      </Button>
-                    ),
-                    readOnly: true,
-                  }}
+                <ReadOnlyTextFieldComponent
+                  label="Company's website link"
+                  value={companyWebsite}
+                  onChange={(e) => setCompanyWebsite(e.target.value)}
+                  onEdit={() => handleEdit("companyWebsite")}
                 />
               </div>
             </div>
 
             <div className="relative">
-              <ReadOnlyTextField
-                fullWidth
-                label="Brief about the company"
-                variant="outlined"
+              <ReadOnlyTextFieldComponent
+                label="Bried about the company"
+                value={briefAboutCompany}
                 multiline
                 rows={4}
-                value={briefAboutCompany}
                 onChange={(e) => setBriefAboutCompany(e.target.value)}
-                margin="normal"
-                InputProps={{
-                  endAdornment: (
-                    <Button
-                      onClick={() => handleEdit("briefAboutCompany")}
-                      className="absolute right"
-                    >
-                      <AiOutlineEdit />
-                    </Button>
-                  ),
-                  readOnly: true,
-                }}
+                onEdit={() => handleEdit("briefAboutCompany")}
               />
             </div>
 
@@ -524,15 +482,15 @@ function DeveloperProfile() {
               <ReadOnlyTextField
                 fullWidth
                 label="Have you executed any project that qualifies for grant before?"
-                variant="outlined"
+                variant="standard"
                 select
-                value={executedGrantProject}
-                onChange={(e) => setExecutedGrantProject(e.target.value)}
+                value={previousGrant}
+                onChange={(e) => setPreviousGrant(e.target.value)}
                 margin="normal"
                 InputProps={{
                   endAdornment: (
                     <Button
-                      onClick={() => handleEdit("executedGrantProject")}
+                      onClick={() => handleEdit("previousGrant")}
                       className="absolute right"
                     >
                       <AiOutlineEdit />
@@ -565,7 +523,7 @@ function DeveloperProfile() {
                     <input
                       type="file"
                       id="director-upload"
-                      accept=".pdf"
+                      accept=".pdf, .jpg, .jpeg, .png,"
                       onChange={(e) =>
                         handleFileUpload(e, setDirectorFile, "directorFile")
                       }
@@ -588,7 +546,7 @@ function DeveloperProfile() {
                     <input
                       type="file"
                       id="cac-cert-upload"
-                      accept=".pdf"
+                      accept=".pdf, .jpg, .jpeg, .png,"
                       onChange={(e) =>
                         handleFileUpload(e, setCacFile, "cacFile")
                       }
@@ -611,7 +569,7 @@ function DeveloperProfile() {
                     <input
                       type="file"
                       id="memart-upload"
-                      accept=".pdf"
+                      accept=".pdf, .jpg, .jpeg, .png,"
                       onChange={(e) =>
                         handleFileUpload(e, setMemartFile, "memartFile")
                       }
@@ -627,236 +585,55 @@ function DeveloperProfile() {
           </div>
         </div>
       </div>
-
-      <StyledModal open={open} onClose={() => setOpen(false)}>
-        <ModalContent>
-          <h2 className="text-l text-primary font-semibold mb-4">
-            Edit Profile
-          </h2>
-
-          <TextField
-            fullWidth
-            label="Company's Name"
-            variant="outlined"
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-            margin="normal"
-            ref={inputRefs.companyName}
-          />
-          <TextField
-            fullWidth
-            label="Address"
-            variant="outlined"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            margin="normal"
-            ref={inputRefs.address}
-          />
-          <TextField
-            fullWidth
-            label="Email"
-            variant="outlined"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            margin="normal"
-            ref={inputRefs.email}
-          />
-          <TextField
-            fullWidth
-            label="Representative's Name"
-            variant="outlined"
-            value={representativeName}
-            onChange={(e) => setRepresentativeName(e.target.value)}
-            margin="normal"
-            ref={inputRefs.representativeName}
-          />
-          <TextField
-            fullWidth
-            label="Years of Operation"
-            variant="outlined"
-            value={yearsOfOperation}
-            onChange={(e) => setYearsOfOperation(e.target.value)}
-            margin="normal"
-            ref={inputRefs.yearsOfOperation}
-          />
-          <TextField
-            fullWidth
-            label="Number of Projects"
-            variant="outlined"
-            value={noOfProjects}
-            onChange={(e) => setNoOfProjects(e.target.value)}
-            margin="normal"
-            ref={inputRefs.noOfProjects}
-          />
-          <TextField
-            fullWidth
-            label="Company's Housing Number"
-            variant="outlined"
-            value={companyHousing}
-            onChange={(e) => setCompanyHousing(e.target.value)}
-            margin="normal"
-            ref={inputRefs.companyHousing}
-          />
-          <TextField
-            fullWidth
-            label="Company's Website"
-            variant="outlined"
-            value={companyWeb}
-            onChange={(e) => setCompanyWeb(e.target.value)}
-            margin="normal"
-            ref={inputRefs.companyWeb}
-          />
-          <TextField
-            fullWidth
-            label="Brief about the company"
-            variant="outlined"
-            multiline
-            rows={4}
-            value={briefAboutCompany}
-            onChange={(e) => setBriefAboutCompany(e.target.value)}
-            margin="normal"
-            ref={inputRefs.briefAboutCompany}
-          />
-          <FormGroup>
-            <label className="block text-sm font-medium text-gray-700">
-              Focus Area
-            </label>
-            <div className="flex flex-wrap gap-4">
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={focusAreas.includes("Wind")}
-                    onChange={handleFocusAreaChange}
-                    value="Wind"
-                  />
-                }
-                label="Wind"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={focusAreas.includes("Hydro")}
-                    onChange={handleFocusAreaChange}
-                    value="Hydro"
-                  />
-                }
-                label="Hydro"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={focusAreas.includes("Gas")}
-                    onChange={handleFocusAreaChange}
-                    value="Gas"
-                  />
-                }
-                label="Gas"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={focusAreas.includes("Solar")}
-                    onChange={handleFocusAreaChange}
-                    value="Solar"
-                  />
-                }
-                label="Solar"
-              />
-            </div>
-          </FormGroup>
-          <TextField
-            fullWidth
-            label="Have you executed any project that qualifies for grant before?"
-            variant="outlined"
-            select
-            value={executedGrantProject}
-            onChange={(e) => setExecutedGrantProject(e.target.value)}
-            margin="normal"
-          >
-            <MenuItem value="Yes">Yes</MenuItem>
-            <MenuItem value="No">No</MenuItem>
-          </TextField>
-
-          <div className="details-section">
-            <hr className="my-4 border-primary" />
-            <div className="flex flex-col mb-4 sm:flex-row sm:space-x-4">
-              <div className="flex-1 mb-4 sm:mb-0">
-                <label
-                  htmlFor="director-upload"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Director/Shareholder
-                </label>
-                <div className="flex items-center border rounded-md border-gray-300 p-2">
-                  <input
-                    type="file"
-                    id="director-upload"
-                    accept=".pdf"
-                    onChange={(e) =>
-                      handleFileUpload(e, setDirectorFile, "directorFile")
-                    }
-                    className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
-                  />
-                  <i className="text-gray-500">
-                    <AiOutlineCloudUpload />
-                  </i>
-                </div>
-              </div>
-
-              <div className="flex-1 mb-4 sm:mb-0">
-                <label
-                  htmlFor="cac-cert-upload"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  CAC Cert
-                </label>
-                <div className="flex items-center border rounded-md border-gray-300 p-2">
-                  <input
-                    type="file"
-                    id="cac-cert-upload"
-                    accept=".pdf"
-                    onChange={(e) => handleFileUpload(e, setCacFile, "cacFile")}
-                    className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
-                  />
-                  <i className="text-gray-500">
-                    <AiOutlineCloudUpload />
-                  </i>
-                </div>
-              </div>
-
-              <div className="flex-1 mb-4 sm:mb-0">
-                <label
-                  htmlFor="memart-upload"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Memart
-                </label>
-                <div className="flex items-center border rounded-md border-gray-300 p-2">
-                  <input
-                    type="file"
-                    id="memart-upload"
-                    accept=".pdf"
-                    onChange={(e) =>
-                      handleFileUpload(e, setMemartFile, "memartFile")
-                    }
-                    className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
-                  />
-                  <i className="text-gray-500">
-                    <AiOutlineCloudUpload />
-                  </i>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="mt-4 flex justify-end">
-            <Button variant="contained" color="primary" onClick={handleSave}>
-              Save
-            </Button>
-          </div>
-        </ModalContent>
-      </StyledModal>
+      <ProfileModal
+        open={open}
+        setOpen={setOpen}
+        companyName={companyName}
+        setCompanyName={setCompanyName}
+        address={address}
+        setAddress={setAddress}
+        representativeEmail={representativeEmail}
+        setRepresentativeEmail={setRepresentativeEmail}
+        representativeName={representativeName}
+        setRepresentativeName={setRepresentativeName}
+        operationYears={operationYears}
+        setOperationYears={setOperationYears}
+        projectsCount={projectsCount}
+        setProjectsCount={setProjectsCount}
+        houseNumber={houseNumber}
+        setHouseNumber={setHouseNumber}
+        companyWebsite={companyWebsite}
+        setCompanyWebsite={setCompanyWebsite}
+        briefAboutCompany={briefAboutCompany}
+        setBriefAboutCompany={setBriefAboutCompany}
+        focusAreas={focusAreas}
+        setFocusAreas={setFocusAreas}
+        previousGrant={previousGrant}
+        setPreviousGrant={setPreviousGrant}
+        handleFocusAreaChange={handleFocusAreaChange}
+        handleFileUpload={handleFileUpload}
+        directorFile={directorFile}
+        setDirectorFile={setDirectorFile}
+        cacFile={cacFile}
+        setCacFile={setCacFile}
+        memartFile={memartFile}
+        setMemartFile={setMemartFile}
+        handleSave={handleSave}
+      />
+      <ResponseModal
+        isOpen={responseModalOpen}
+        toggle={() => setResponseModalOpen(false)}
+        message={responseMessage}
+      />
+      <InfoModal
+        isOpen={profileModalOpen}
+        toggle={() => setProfileModalOpen(false)}
+        title="Complete Your Profile"
+        message="Please complete your profile to proceed."
+        buttonText="OK"
+      />
     </div>
   );
-}
+};
 
 export default DeveloperProfile;
