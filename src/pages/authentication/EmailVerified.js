@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const EmailVerified = () => {
   const navigate = useNavigate();
-  const { code } = useParams(); 
+  const { code } = useParams();
   const [verificationStatus, setVerificationStatus] = useState(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const hasRunEffect = useRef(false); 
 
   useEffect(() => {
-    if (!code) {
-      navigate('*');  
-      return;
-    }
-  
+    if (!code || verificationStatus !== null || hasRunEffect.current) return;
+
+    hasRunEffect.current = true; 
+
+    setIsVerifying(true);
+
     const verifyEmail = async () => {
       try {
         const response = await axios.get(`https://greenpower-stage-71fa5ec0b66d.herokuapp.com/auth/verify-email/${code}`, {
@@ -21,26 +24,35 @@ const EmailVerified = () => {
             'Content-Type': 'application/json',
           },
         });
-        
-        if (response.data.success) {
+
+        console.log('API response:', response.data);
+
+        if (response.data.status) {
+          console.log('Email verification successful!');
           setVerificationStatus('success');
         } else {
+          console.log('Email verification failed:', response.data.message);
           setVerificationStatus('failure');
         }
       } catch (error) {
-        console.error('Verification error:', error);
-        setVerificationStatus('failure'); 
+        if (error.response && error.response.status === 404) {
+          console.error('Verification error: 404 Not Found');
+          navigate('*');
+        } else {
+          console.error('Verification error:', error);
+          setVerificationStatus('failure');
+        }
+      } finally {
+        setIsVerifying(false);
       }
     };
-  
+
     verifyEmail();
-  }, [code, navigate]);
-  
+  }, [code, navigate, verificationStatus]);
 
   const handleLoginRedirect = () => {
-    navigate('/login'); 
+    navigate('/login');
   };
-
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">

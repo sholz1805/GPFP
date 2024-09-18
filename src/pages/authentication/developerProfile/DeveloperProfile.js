@@ -99,12 +99,23 @@ const DeveloperProfile = () => {
   const [responseModalOpen, setResponseModalOpen] = useState(false);
   const [responseMessage, setResponseMessage] = useState("");
 
+  const [initialDirectorFile, setInitialDirectorFile] = useState("");
+  const [initialCacFile, setInitialCacFile] = useState("");
+  const [initialMemartFile, setInitialMemartFile] = useState("");
+
+  useEffect(() => {
+    setInitialDirectorFile(directorFile);
+    setInitialCacFile(cacFile);
+    setInitialMemartFile(memartFile);
+  }, [directorFile, cacFile, memartFile]);
+
   const dispatch = useDispatch();
 
   const location = useLocation();
-  const userId = location.state.userId;
-  const token = location.state.token;
-  console.log(token);
+  const UniqueId = location.state.uniqueId;
+  console.log(UniqueId);
+  // const token = location.state.token;
+  // console.log(token);
 
   const inputRefs = {
     representativeName: useRef(null),
@@ -120,58 +131,56 @@ const DeveloperProfile = () => {
   };
 
   useEffect(() => {
-    if (
-      location.state &&
-      location.state.userId !== null &&
-      location.state.userId !== undefined
-    ) {
-      const fetchUserProfile = async (userId) => {
+    if (UniqueId !== null && UniqueId !== undefined) {
+      const fetchUserProfile = async (UniqueId) => {
         try {
-          const userProfile = await dispatch(fetchProfile(userId, token));
-          const fetchedUserProfile = userProfile.data.data;
+          const response = await dispatch(fetchProfile(UniqueId));
+          const userProfile = response.payload;
+          console.log(userProfile);
 
-          // Check if there's any error in the fetched profile data
-          if (fetchedUserProfile && fetchedUserProfile.error) {
+          if (userProfile && userProfile.error) {
             setProfileModalOpen(true);
             return;
           }
 
-          if (fetchedUserProfile) {
-            setProfile(fetchedUserProfile);
-            console.log(fetchedUserProfile);
+          if (userProfile) {
+            setProfile(userProfile);
+            console.log(userProfile);
 
-            setCompanyName(fetchedUserProfile.companyName);
-            setAddress(fetchedUserProfile.address);
-            setRepresentativeEmail(fetchedUserProfile.representativeEmail);
-            setRepresentativeName(fetchedUserProfile.representativeName);
-            setOperationYears(parseInt(fetchedUserProfile.operationYears, 10) || 0);
-            setProjectsCount(parseInt(fetchedUserProfile.projectsCount, 10) || 0);
-            setHouseNumber(parseInt(fetchedUserProfile.houseNumber, 10) || 0);
-            setCompanyWebsite(fetchedUserProfile.companyWebsite);
-            setBriefAboutCompany(fetchedUserProfile.briefAboutCompany);
-            setFocusAreas(fetchedUserProfile.focusAreas);
-            setPreviousGrant(fetchedUserProfile.previousGrant);
-            setDirectorFile(fetchedUserProfile.directorFile);
-            setCacFile(fetchedUserProfile.cacFile);
-            setMemartFile(fetchedUserProfile.memartFile);
-            setProfileImage(fetchedUserProfile.profileImage);
+            updateComponentState(userProfile);
           } else {
+            console.error("Error fetching profile:");
             setProfileModalOpen(true);
           }
         } catch (error) {
-          if (error.response && error.response.status === 401) {
-            setProfileModalOpen(true);
-          } else {
-            console.error("Error fetching profile", error);
-            setProfileModalOpen(true);
-          }
+          console.error("Error fetching profile:", error.message || error);
+          setProfileModalOpen(true);
         }
       };
-      fetchUserProfile(location.state.userId);
+
+      fetchUserProfile(UniqueId);
     } else {
       setProfileModalOpen(true);
     }
-  }, [dispatch, location.state]);
+  }, [dispatch, UniqueId]);
+
+  const updateComponentState = (userProfile) => {
+    setCompanyName(userProfile.data.companyName);
+    setAddress(userProfile.data.companyAddress);
+    setRepresentativeEmail(userProfile.data.representativeEmail);
+    setRepresentativeName(userProfile.data.representativeName);
+    setOperationYears(parseInt(userProfile.data.operationYears, 10) || 0);
+    setProjectsCount(parseInt(userProfile.data.projectsCount, 10) || 0);
+    setHouseNumber(parseInt(userProfile.data.houseNumber, 10) || 0);
+    setCompanyWebsite(userProfile.data.companyWebsite);
+    setBriefAboutCompany(userProfile.data.briefAboutCompany);
+    setFocusAreas(userProfile.data.focusArea || []);
+    setPreviousGrant(userProfile.data.previousGrant || "");
+    setDirectorFile(userProfile.data.companyDirectors);
+    setCacFile(userProfile.data.companyCertificate);
+    setMemartFile(userProfile.data.companyMemart);
+    setProfileImage(userProfile.data.developerProfilePicture);
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files ? e.target.files[0] : null;
@@ -216,11 +225,11 @@ const DeveloperProfile = () => {
     );
   };
 
-  const handleFileUpload = async (event, setFileState, folder) => {
+  const handleFileUpload = async (event, setFileState, field) => {
     const file = event.target.files[0];
     if (file) {
       try {
-        const response = await CloudinaryUpload(file, folder);
+        const response = await CloudinaryUpload(file, "users_documents");
         setFileState(response.secure_url);
       } catch (error) {
         console.error("Error uploading file to Cloudinary", error);
@@ -230,9 +239,13 @@ const DeveloperProfile = () => {
   };
 
   const handleCreateProfile = async () => {
+    setIsLoading(true);
+    setResponseModalOpen(true);
+    setResponseMessage("Saving profile...");
+
     try {
       const profileData = {
-        uniqueId: userId,
+        uniqueId: UniqueId,
         companyAddress: address,
         houseNumber: parseInt(houseNumber, 10),
         companyWebsite,
@@ -242,29 +255,39 @@ const DeveloperProfile = () => {
         projectsCount: parseInt(projectsCount, 10),
         grantQualified: 21.0,
         previousGrant,
-        // executionType: [],
-        // projectType: [],
-        // equipmentSupply: [],
         focusArea: focusAreas,
         developerProfilePicture: profileImage,
-        companyDirectors: directorFile,
-        companyCertificate: cacFile,
-        companyMemart: memartFile,
+        companyDirectors:
+          directorFile === initialDirectorFile
+            ? initialDirectorFile
+            : directorFile,
+        companyCertificate:
+          cacFile === initialCacFile ? initialCacFile : cacFile,
+        companyMemart:
+          memartFile === initialMemartFile ? initialMemartFile : memartFile,
       };
-      console.log("profileData:", profileData);
 
-      const response = await dispatch(createProfile(profileData, token));
-      const newProfile = response.data.data;
-      console.log(newProfile);
+      // if (!profileData.companyName || !profileData.address || !profileData.representativeName || !profileData.representativeEmail) {
+      //   throw new Error("Please fill in all required fields");
+      // }
+      const response = await dispatch(createProfile(profileData));
 
-      setProfile(newProfile);
+      if (response.error) {
+        throw new Error(`Error creating profile: ${response.error}`);
+      }
 
-      setResponseMessage("Profile created successfully!");
-      setResponseModalOpen(true);
+      if (response.data && response.data.data) {
+        const newProfile = response.data.data;
+        setProfile(newProfile);
+        setResponseMessage("Profile created successfully!");
+      } else {
+        setResponseMessage("Profile created successfully!");
+      }
     } catch (error) {
-      console.error(" Error creating profile", error);
+      console.error("Error creating profile:", error);
       setResponseMessage(`Error creating profile: ${error.message}`);
-      setResponseModalOpen(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -430,7 +453,7 @@ const DeveloperProfile = () => {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={focusAreas.includes("Wind")}
+                      checked={focusAreas && focusAreas.includes("Wind")}
                       onChange={handleFocusAreaChange}
                       value="Wind"
                       disabled
@@ -442,7 +465,7 @@ const DeveloperProfile = () => {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={focusAreas.includes("Hydro")}
+                      checked={focusAreas && focusAreas.includes("Hydro")}
                       onChange={handleFocusAreaChange}
                       value="Hydro"
                       disabled
@@ -454,7 +477,7 @@ const DeveloperProfile = () => {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={focusAreas.includes("Gas")}
+                      checked={focusAreas && focusAreas.includes("Gas")}
                       onChange={handleFocusAreaChange}
                       value="Gas"
                       disabled
@@ -466,7 +489,7 @@ const DeveloperProfile = () => {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={focusAreas.includes("Solar")}
+                      checked={focusAreas && focusAreas.includes("Solar")}
                       onChange={handleFocusAreaChange}
                       value="Solar"
                       disabled
@@ -484,7 +507,7 @@ const DeveloperProfile = () => {
                 label="Have you executed any project that qualifies for grant before?"
                 variant="standard"
                 select
-                value={previousGrant}
+                value={previousGrant || ""}
                 onChange={(e) => setPreviousGrant(e.target.value)}
                 margin="normal"
                 InputProps={{
@@ -519,20 +542,31 @@ const DeveloperProfile = () => {
                   >
                     Director/Shareholder
                   </label>
-                  <div className="flex items-center border rounded-md border-gray-300 p-2">
-                    <input
-                      type="file"
-                      id="director-upload"
-                      accept=".pdf, .jpg, .jpeg, .png,"
-                      onChange={(e) =>
-                        handleFileUpload(e, setDirectorFile, "directorFile")
-                      }
-                      className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
-                    />
-                    <i className="text-gray-500">
-                      <AiOutlineCloudUpload />
-                    </i>
-                  </div>
+                  {directorFile ? (
+                    <div className="flex items-center border rounded-md border-gray-300 p-2">
+                      <span className="block w-full text-sm text-gray-500">
+                        {directorFile.substring(0, 20) + "..."}
+                      </span>
+                      <i className="text-gray-500">
+                        <AiOutlineCloudUpload />
+                      </i>
+                    </div>
+                  ) : (
+                    <div className="flex items-center border rounded-md border-gray-300 p-2">
+                      <input
+                        type="file"
+                        id="director-upload"
+                        accept=".pdf, .jpg, .jpeg, .png,"
+                        onChange={(e) =>
+                          handleFileUpload(e, setDirectorFile, "directorFile")
+                        }
+                        className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
+                      />
+                      <i className="text-gray-500">
+                        <AiOutlineCloudUpload />
+                      </i>
+                    </div>
+                  )}
                 </div>
 
                 <div className="w-full sm:w-1/3 px-2 mb-4">
@@ -624,6 +658,8 @@ const DeveloperProfile = () => {
         isOpen={responseModalOpen}
         toggle={() => setResponseModalOpen(false)}
         message={responseMessage}
+        status={responseMessage.includes("successfully") ? "success" : "error"}
+        isLoading={isLoading}
       />
       <InfoModal
         isOpen={profileModalOpen}

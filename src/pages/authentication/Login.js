@@ -43,13 +43,13 @@ const Login = () => {
     try {
       const response = await dispatch(signin({ email, password }));
       if (response.type === 'SIGNIN_SUCCESS') {
-        const userId = response.payload.data.uniqueId; 
+        const uniqueId = response.payload.data.uniqueId; 
         const token = response.payload.data.jwt.jsonWebToken;
         console.log(token)
         toast.success("Sign in successful! Redirecting...");
         setTimeout(() => {
           navigate("/profile-developer", {
-            state: { userId: userId, token: token } 
+            state: { uniqueId: uniqueId, token: token } 
           });
         }, 3000); 
       }

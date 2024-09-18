@@ -7,57 +7,92 @@ export const FETCH_PROFILE_REQUEST = "FETCH_PROFILE_REQUEST";
 export const FETCH_PROFILE_SUCCESS = "FETCH_PROFILE_SUCCESS";
 export const FETCH_PROFILE_FAILURE = "FETCH_PROFILE_FAILURE";
 
-const baseUrl = "https://greenpower-stage-71fa5ec0b66d.herokuapp.com"
+const baseUrl = "https://greenpower-stage-71fa5ec0b66d.herokuapp.com";
 
-export const fetchProfile = (userId, token) => async (dispatch) => {
-  try {
-    dispatch({ type: FETCH_PROFILE_REQUEST });
+export const createProfileRequest = () => ({ type: CREATE_PROFILE_REQUEST });
 
-    const headers = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
+export const createProfileSuccess = (profileData) => ({
+  type: CREATE_PROFILE_SUCCESS,
+  payload: profileData,
+});
 
-    const { data } = await axios.get(
-      baseUrl + `/api/v1/get/developer/profile/${userId}`,
-      { headers }
-    );
+export const createProfileFailure = (error) => ({
+  type: CREATE_PROFILE_FAILURE,
+  payload: error,
+});
 
-    dispatch({ type: FETCH_PROFILE_SUCCESS, payload: data });
-  } catch (error) {
-    dispatch({
-      type: FETCH_PROFILE_FAILURE,
-      payload:
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message,
-    });
-  }
+export const createProfile = (profileData) => {
+  return async (dispatch) => {
+    dispatch(createProfileRequest());
+
+    try {
+      
+      // if (!profileData.uniqueId || !profileData.companyAddress || !profileData.representativeName || !profileData.representativeEmail) {
+      //   throw new Error('Please fill in all required fields');
+      // }
+
+      // const operationYears = parseInt(profileData.operationYears, 10);
+      // const projectsCount = parseInt(profileData.projectsCount, 10);
+
+      // if (isNaN(operationYears) || isNaN(projectsCount)) {
+      //   throw new Error('Invalid operation years or projects count');
+      // }
+
+      // profileData.operationYears = operationYears;
+      // profileData.projectsCount = projectsCount;
+
+      const response = await axios.post(baseUrl + "/api/v1/create/profile/developer", profileData);
+
+      if (response.status !== 200) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+
+      dispatch(createProfileSuccess(response.data));
+
+      return Promise.resolve({ type: CREATE_PROFILE_SUCCESS, payload: response.data });
+    } catch (error) {
+      const errorMessage = error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message;
+
+      dispatch(createProfileFailure(errorMessage));
+
+      return Promise.reject({ type: CREATE_PROFILE_FAILURE, payload: errorMessage });
+    }
+  };
 };
 
-export const createProfile = (profileData, token) => async (dispatch) => {
-  try {
-    dispatch({ type: CREATE_PROFILE_REQUEST });
+export const fetchProfileRequest = () => ({ type: FETCH_PROFILE_REQUEST });
 
-    const headers = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
+export const fetchProfileSuccess = (uniqueId) => ({
+  type: FETCH_PROFILE_SUCCESS,
+  payload: uniqueId,
+});
 
-    const { data } = await axios.post(
-      baseUrl + "/api/vi/create/profile/developer",
-      profileData,
-      { headers }
-    );
+export const fetchProfileFailure = (error) => ({
+  type: FETCH_PROFILE_FAILURE,
+  payload: error,
+});
 
-    dispatch({ type: CREATE_PROFILE_SUCCESS, payload: data });
-  } catch (error) {
-    dispatch({
-      type: CREATE_PROFILE_FAILURE,
-      payload:
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message,
-    });
-  }
+export const fetchProfile = (uniqueId) => {
+  return async (dispatch) => {
+    dispatch(fetchProfileRequest());
+
+    try {
+      const response = await axios.get(baseUrl + `/api/v1/get/developer/profile/${uniqueId}`);
+
+      dispatch(fetchProfileSuccess(response.data));
+      console.log(response.data)
+
+      return Promise.resolve({ type: FETCH_PROFILE_SUCCESS, payload: response.data });
+    } catch (error) {
+      const errorMessage = error.response && error.response.data.message
+        ? error.response.data.message
+        : 'Profile fetch failed!';
+
+      dispatch(fetchProfileFailure(errorMessage));
+
+      return Promise.reject({ type: FETCH_PROFILE_FAILURE, payload: errorMessage });
+    }
+  };
 };
