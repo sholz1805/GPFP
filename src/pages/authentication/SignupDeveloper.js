@@ -1,89 +1,16 @@
-// import React, { useState } from 'react';
-// import { FaEye, FaEyeSlash } from 'react-icons/fa';
-
-// const SignupDeveloper = () => {
-//   const [showPassword, setShowPassword] = useState(false);
-//   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-//   const togglePasswordVisibility = () => {
-//     setShowPassword(!showPassword);
-//   };
-
-//   const toggleConfirmPasswordVisibility = () => {
-//     setShowConfirmPassword(!showConfirmPassword);
-//   };
-
-//   return (
-//     <div className="relative min-h-screen flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: "url('/images/bg1_.jpg')" }}>
-//       <div className="absolute inset-0 bg-black opacity-70"></div>
-//       <div className="relative z-10 bg-white rounded-lg shadow-lg p-8 md:p-10 w-11/12 max-w-sm">
-
-//         <div className="flex justify-center mb-8">
-//           <img src="/images/gpfpLogo.svg" alt="Logo" className="h-8 w-auto" />
-//         </div>
-
-//         <h2 className="text-2xl font-bold mb-8 text-center text-[#467D9A]">Create Account</h2>
-//         <form>
-//           <div className="mb-4">
-//             <label htmlFor="fullname" className="block text-gray-700 text-sm font-bold mb-2">Fullname</label>
-//             <input type="text" id="fullname" placeholder="Enter your fullname" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-//           </div>
-//           <div className="mb-4">
-//             <label htmlFor="company" className="block text-gray-700 text-sm font-bold mb-2">Company's Name</label>
-//             <input type="text" id="company" placeholder="Enter your company's name" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-//           </div>
-//           <div className="mb-4">
-//             <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">Email</label>
-//             <input type="email" id="email" placeholder="Enter your email" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-//           </div>
-//           <div className="mb-4">
-//             <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">Phone Number</label>
-//             <input type="tel" id="phone" placeholder="Enter your phone number" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-//           </div>
-//           <div className="mb-4">
-//             <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">Create Password</label>
-//             <div className="relative">
-//               <input type={showPassword ? 'text' : 'password'} id="password" placeholder="Create a password" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-//               <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onClick={togglePasswordVisibility}>
-//                 {showPassword ? <FaEyeSlash /> : <FaEye />}
-//               </div>
-//             </div>
-//           </div>
-//           <div className="mb-6">
-//             <label htmlFor="confirmPassword" className="block text-gray-700 text-sm font-bold mb-2">Confirm Password</label>
-//             <div className="relative">
-//               <input type={showConfirmPassword ? 'text' : 'password'} id="confirmPassword" placeholder="Confirm your password" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-//               <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onClick={toggleConfirmPasswordVisibility}>
-//                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-//               </div>
-//             </div>
-//           </div>
-
-//           <button type="submit" className="w-full bg-[#467D9A] hover:bg-[#549BC2] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-//             Sign Up
-//           </button>
-//         </form>
-
-//         <div className="mt-6 text-center">
-//           <p className="text-sm text-gray-700">
-//             Already have an account? <a href="/signin" className="text-[#467D9A] hover:text-[#549BC2] font-bold">Sign In</a>
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default SignupDeveloper;
-
 import React, { useState } from "react";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
-import { FaCheckCircle, FaEye, FaEyeSlash } from "react-icons/fa";
-import { signup } from "../../redux/actions/signUpActions";
+import {
+  FaCheckCircle,
+  FaEye,
+  FaEyeSlash,
+  FaTimesCircle,
+} from "react-icons/fa";
+import { signupDeveloper } from "../../redux/actions/signUpActions";
 import { Link } from "react-router-dom";
-import './phoneNumber.css'
+import "./phoneNumber.css";
 
 const SignupDeveloper = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -131,7 +58,6 @@ const SignupDeveloper = () => {
     }
 
     if (name === "password" || name === "confirmPassword") {
-      // Immediately validate and clear the error if the passwords match
       if (formData.password !== value && name === "confirmPassword") {
         setPasswordError("Passwords do not match");
       } else if (formData.confirmPassword !== value && name === "password") {
@@ -190,15 +116,13 @@ const SignupDeveloper = () => {
     const realFormData = { ...formData };
     delete realFormData.confirmPassword;
 
-    dispatch(signup(realFormData))
+    dispatch(signupDeveloper(realFormData))
       .then((response) => {
-        if (response.type === "SIGNUP_SUCCESS") {
-          setVerificationEmail(realFormData.email);
-          setIsModalOpen(true);
-        }
+        setIsModalOpen(true);
+        setVerificationEmail(realFormData.email);
       })
       .catch((error) => {
-        console.error("Signup failed", error);
+        setIsModalOpen(true);
       });
   };
 
@@ -365,17 +289,6 @@ const SignupDeveloper = () => {
           >
             {signupState.loading ? "Signing up..." : "Sign Up"}
           </button>
-
-          {signupState.error && (
-            <p className="text-red-500 text-xs italic mt-4">
-              {signupState.error}
-            </p>
-          )}
-          {signupState.userData && (
-            <p className="text-green-500 text-xs italic mt-4">
-              Signup successful!
-            </p>
-          )}
         </form>
 
         <div className="mt-6 text-center">
@@ -393,17 +306,28 @@ const SignupDeveloper = () => {
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-            <div className="flex flex-col items-center">
-              <FaCheckCircle className="text-green-500 text-4xl mb-3" />
-              <p className="text-lg font-semibold">Verify Email</p>
-              <p className="text-gray-500 mt-2 text-center leading-tight">
-                An email has been sent to{" "}
-                <span className="font-bold text-primary">
-                  {verificationEmail}
-                </span>
-                . Please check your inbox to verify your email address.
-              </p>
-            </div>
+            {signupState.error ? (
+              <div className="flex flex-col items-center">
+                <FaTimesCircle className="text-red-500 text-4xl mb-3" />
+                <p className="text-lg font-semibold">Error</p>
+                <p className="text-gray-500 mt-2 text-center leading-tight">
+                  {signupState.error}
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center">
+                <FaCheckCircle className="text-green-500 text-4xl mb-3" />
+                <p className="text-lg font-semibold">Verify Email</p>
+                <p className="text-gray-500 mt-2 text-center leading-tight whitespace-pre-wrap">
+                  An email has been sent to{" "}
+                  <span className="font-bold text-primary">
+                    {verificationEmail}
+                  </span>
+                  <br/>
+                  Please check your inbox to verify your email address.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}

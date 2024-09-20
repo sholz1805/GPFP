@@ -12,7 +12,10 @@ const ResponseModal = ({ isOpen, toggle, message, status, isLoading }) => {
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
         <div className="flex flex-col items-center justify-center">
           {isLoading ? (
+            <>
             <FaSpinner size={24} className="animate-spin" />
+            <p>Loading...</p>
+            </>
           ) : (
             <div className="flex flex-col items-center justify-center">
               {status === "success" ? (

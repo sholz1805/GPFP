@@ -1,32 +1,32 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { signin } from "../../redux/actions/signInActions"; 
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; 
+import { signin } from "../../redux/actions/signInActions";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [response, setResponse] = useState({}); 
 
   const validateEmail = (email) => {
-    
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-   
+
+    setLoading(true);
     setEmailError("");
     setPasswordError("");
 
-    
     if (!email) {
       setEmailError("Email is required");
       return;
@@ -43,20 +43,33 @@ const Login = () => {
     try {
       const response = await dispatch(signin({ email, password }));
       if (response.type === 'SIGNIN_SUCCESS') {
-        const uniqueId = response.payload.data.uniqueId; 
+        const uniqueId = response.payload.data.uniqueId;
         const token = response.payload.data.jwt.jsonWebToken;
-        console.log(token)
-        toast.success("Sign in successful! Redirecting...");
+        const role = response.payload.data.role; 
+            
+        setResponse(response); 
+        setLoading(false);
+        setIsModalOpen(true); 
+      
         setTimeout(() => {
-          navigate("/profile-developer", {
-            state: { uniqueId: uniqueId, token: token } 
-          });
-        }, 3000); 
+          if (role === 'DEVELOPER') {
+            navigate("/profile-developer", {
+              state: { uniqueId: uniqueId, token: token },
+            });
+          } else {
+            navigate("/profile-investor", {
+              state: { uniqueId: uniqueId, token: token },
+            });
+          }
+        }, 3000);
       }
     } catch (error) {
       setPasswordError(error.payload || "Signin failed!"); 
-    }
+      setLoading(false);
+      setIsModalOpen(true);
   };
+};
+  
 
   return (
     <div
@@ -74,7 +87,9 @@ const Login = () => {
         </h2>
 
         <form onSubmit={handleSubmit}>
-          {emailError && <p className="text-red-500 text-xs mb-2">{emailError}</p>}
+          {emailError && (
+            <p className="text-red-500 text-xs mb-2">{emailError}</p>
+          )}
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -106,7 +121,9 @@ const Login = () => {
               placeholder="Enter your password"
               className="appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-xs md:text-sm text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
-            {passwordError && <p className="text-red-500 text-xs mt-1">{passwordError}</p>}
+            {passwordError && (
+              <p className="text-red-500 text-xs mt-1">{passwordError}</p>
+            )}
           </div>
 
           <div className="mb-6 text-right">
@@ -121,8 +138,15 @@ const Login = () => {
           <button
             type="submit"
             className="w-full bg-[#467D9A] hover:bg-secondary text-white font-medium py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            disabled={loading} 
           >
-            Sign In
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <p className="text-m font-medium">Loading...</p>
+              </div>
+            ) : (
+              <p>Sign In</p>
+            )}
           </button>
         </form>
 
@@ -139,9 +163,32 @@ const Login = () => {
         </div>
       </div>
 
-      <ToastContainer />
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+            {response.type === 'SIGNIN_SUCCESS' ? (
+              <div className="flex flex-col items-center">
+                <FaCheckCircle className="text-green-500 text-4xl mb-3" />
+                <p className="text-lg font-semibold">Sign in successful!</p>
+                <p className="text-gray-500 mt-2 text-center leading-tight">
+                  You will be redirected to your profile page.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center">
+                <FaTimesCircle className="text-red-500 text-4xl mb-3" />
+                <p className="text-lg font-semibold">Error</p>
+                <p className="text-gray-500 mt-2 text-center leading-tight">
+                  {response.payload || "Signin failed!"}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
 
 export default Login;

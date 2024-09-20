@@ -18,13 +18,11 @@ import { toast } from "react-toastify";
 import ProfileModal from "./ProfileModal";
 import ResponseModal from "../ResponseModal";
 import {
-  createProfile,
-  fetchProfile,
+  createDeveloperProfile,
+  fetchDeveloperProfile,
 } from "../../../redux/actions/profileActions";
 import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import InfoModal from "../InfoModal";
 /* eslint no-unused-vars: 0 */
 
@@ -134,7 +132,7 @@ const DeveloperProfile = () => {
     if (UniqueId !== null && UniqueId !== undefined) {
       const fetchUserProfile = async (UniqueId) => {
         try {
-          const response = await dispatch(fetchProfile(UniqueId));
+          const response = await dispatch(fetchDeveloperProfile(UniqueId));
           const userProfile = response.payload;
           console.log(userProfile);
 
@@ -253,7 +251,6 @@ const DeveloperProfile = () => {
         representativeEmail,
         operationYears: parseInt(operationYears, 10),
         projectsCount: parseInt(projectsCount, 10),
-        grantQualified: 21.0,
         previousGrant,
         focusArea: focusAreas,
         developerProfilePicture: profileImage,
@@ -270,7 +267,7 @@ const DeveloperProfile = () => {
       // if (!profileData.companyName || !profileData.address || !profileData.representativeName || !profileData.representativeEmail) {
       //   throw new Error("Please fill in all required fields");
       // }
-      const response = await dispatch(createProfile(profileData));
+      const response = await dispatch(createDeveloperProfile(profileData));
 
       if (response.error) {
         throw new Error(`Error creating profile: ${response.error}`);

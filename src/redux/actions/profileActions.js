@@ -7,9 +7,8 @@ export const FETCH_PROFILE_REQUEST = "FETCH_PROFILE_REQUEST";
 export const FETCH_PROFILE_SUCCESS = "FETCH_PROFILE_SUCCESS";
 export const FETCH_PROFILE_FAILURE = "FETCH_PROFILE_FAILURE";
 
-const baseUrl = "https://greenpower-stage-71fa5ec0b66d.herokuapp.com";
-
 export const createProfileRequest = () => ({ type: CREATE_PROFILE_REQUEST });
+const baseUrl = "https://greenpower-stage-71fa5ec0b66d.herokuapp.com";
 
 export const createProfileSuccess = (profileData) => ({
   type: CREATE_PROFILE_SUCCESS,
@@ -21,12 +20,14 @@ export const createProfileFailure = (error) => ({
   payload: error,
 });
 
-export const createProfile = (profileData) => {
+//create profile for developer
+export const createDeveloperProfile = (profileData) => {
+  const endpoint = "/api/v1/create/profile/developer";
+
   return async (dispatch) => {
     dispatch(createProfileRequest());
 
     try {
-      
       // if (!profileData.uniqueId || !profileData.companyAddress || !profileData.representativeName || !profileData.representativeEmail) {
       //   throw new Error('Please fill in all required fields');
       // }
@@ -41,7 +42,7 @@ export const createProfile = (profileData) => {
       // profileData.operationYears = operationYears;
       // profileData.projectsCount = projectsCount;
 
-      const response = await axios.post(baseUrl + "/api/v1/create/profile/developer", profileData);
+      const response = await axios.post(baseUrl + endpoint, profileData);
 
       if (response.status !== 200) {
         throw new Error(`API error: ${response.status} ${response.statusText}`);
@@ -49,15 +50,58 @@ export const createProfile = (profileData) => {
 
       dispatch(createProfileSuccess(response.data));
 
-      return Promise.resolve({ type: CREATE_PROFILE_SUCCESS, payload: response.data });
+      return Promise.resolve({
+        type: CREATE_PROFILE_SUCCESS,
+        payload: response.data,
+      });
     } catch (error) {
-      const errorMessage = error.response && error.response.data.message
-        ? error.response.data.message
-        : error.message;
+      const errorMessage =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message;
 
       dispatch(createProfileFailure(errorMessage));
 
-      return Promise.reject({ type: CREATE_PROFILE_FAILURE, payload: errorMessage });
+      return Promise.reject({
+        type: CREATE_PROFILE_FAILURE,
+        payload: errorMessage,
+      });
+    }
+  };
+};
+
+// create profile for Investor
+export const createInvestorProfile = (profileData) => {
+  const endpoint = "/api/v1/create/profile/investor";
+
+  return async (dispatch) => {
+    dispatch(createProfileRequest());
+
+    try {
+      const response = await axios.post(baseUrl + endpoint, profileData);
+
+      if (response.status !== 200) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+
+      dispatch(createProfileSuccess(response.data));
+
+      return Promise.resolve({
+        type: CREATE_PROFILE_SUCCESS,
+        payload: response.data,
+      });
+    } catch (error) {
+      const errorMessage =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message;
+
+      dispatch(createProfileFailure(errorMessage));
+
+      return Promise.reject({
+        type: CREATE_PROFILE_FAILURE,
+        payload: errorMessage,
+      });
     }
   };
 };
@@ -74,25 +118,67 @@ export const fetchProfileFailure = (error) => ({
   payload: error,
 });
 
-export const fetchProfile = (uniqueId) => {
+// fetch developer profile
+export const fetchDeveloperProfile = (uniqueId) => {
   return async (dispatch) => {
     dispatch(fetchProfileRequest());
 
     try {
-      const response = await axios.get(baseUrl + `/api/v1/get/developer/profile/${uniqueId}`);
+      const response = await axios.get(
+        baseUrl + `/api/v1/get/developer/profile/${uniqueId}`
+      );
 
       dispatch(fetchProfileSuccess(response.data));
-      console.log(response.data)
+      console.log(response.data);
 
-      return Promise.resolve({ type: FETCH_PROFILE_SUCCESS, payload: response.data });
+      return Promise.resolve({
+        type: FETCH_PROFILE_SUCCESS,
+        payload: response.data,
+      });
     } catch (error) {
-      const errorMessage = error.response && error.response.data.message
-        ? error.response.data.message
-        : 'Profile fetch failed!';
+      const errorMessage =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : "Profile fetch failed!";
 
       dispatch(fetchProfileFailure(errorMessage));
 
-      return Promise.reject({ type: FETCH_PROFILE_FAILURE, payload: errorMessage });
+      return Promise.reject({
+        type: FETCH_PROFILE_FAILURE,
+        payload: errorMessage,
+      });
+    }
+  };
+};
+
+// fetch investor profile
+export const fetchInvestorProfile = (uniqueId) => {
+  const endpoint = "/api/v1/get/investor/profile/";
+  return async (dispatch) => {
+    dispatch(fetchProfileRequest());
+
+    try {
+      const response = await axios.get(baseUrl + endpoint + `${uniqueId}`);
+
+      dispatch(fetchProfileSuccess(response.data));
+      console.log(response.data);
+
+      return Promise.resolve({
+        type: FETCH_PROFILE_SUCCESS,
+        payload: response.data,
+      });
+    } catch (error) {
+      const errorMessage =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : "Profile fetch failed!";
+
+      dispatch(fetchProfileFailure(errorMessage));
+
+      return Promise.reject({
+        type: FETCH_PROFILE_FAILURE,
+        payload: errorMessage,
+      });
     }
   };
 };

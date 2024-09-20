@@ -16,14 +16,15 @@ export const signupFailure = (error) => ({
   payload: error,
 });
 
-export const signup = (userData) => {
+export const signupDeveloper = (userData) => {
   const baseUrl = 'https://greenpower-stage-71fa5ec0b66d.herokuapp.com';
+  const endpoint = '/auth/developer/register';
   
   return async (dispatch) => {
     dispatch(signupRequest());
     
     try {   
-      const response = await axios.post(baseUrl + '/auth/developer/register', userData);
+      const response = await axios.post(baseUrl + endpoint , userData);
       console.log(response);
       
       dispatch(signupSuccess(response.data));
@@ -42,35 +43,29 @@ export const signup = (userData) => {
 };
 
 
+export const signupInvestor = (userData) => {
+  const baseUrl = 'https://greenpower-stage-71fa5ec0b66d.herokuapp.com';
+  const endpoint = '/auth/investor/register';
 
-// export const signup = (userData) => {
-//   const baseUrl = 'https://greenpower-stage-71fa5ec0b66d.herokuapp.com';
-  
-//   return async (dispatch) => {
-//     dispatch(signupRequest());
-    
-//     try {
+  return async (dispatch) => {
+    dispatch(signupRequest());
 
-//        //   const config = {
-//     //     headers: {
-//     //       'Content-Type': 'application/json',  // Set content type
-//     //       Authorization: `Bearer YOUR_AUTH_TOKEN`, // Replace with your actual token
-//     //     },
-//     //   };
-//       const response = await axios.post(baseUrl + '/auth/developer/register', userData);
-      
-//       dispatch(signupSuccess(response.data));
-//       // Return the action type to handle it in the component
-//       return { type: SIGNUP_SUCCESS, payload: response.data };
-//     } catch (error) {
-//       const errorMessage = error.response && error.response.data.message
-//         ? error.response.data.message
-//         : 'Signup failed!';
-        
-//       dispatch(signupFailure(errorMessage));
-//       // Return the action type to handle it in the component
-//       return { type: SIGNUP_FAILURE, payload: errorMessage };
-//     }
-//   };
-// };
+    try {
+      const response = await axios.post(baseUrl + endpoint, userData);
+      console.log(response);
+
+      dispatch(signupSuccess(response.data));
+
+      return Promise.resolve({ type: SIGNUP_SUCCESS, payload: response.data });
+    } catch (error) {
+      const errorMessage = error.response && error.response.data.message
+        ? error.response.data.message
+        : 'Signup failed!';
+
+      dispatch(signupFailure(errorMessage));
+
+      return Promise.reject({ type: SIGNUP_FAILURE, payload: errorMessage });
+    }
+  };
+};
 

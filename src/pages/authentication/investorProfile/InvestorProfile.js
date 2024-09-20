@@ -1,28 +1,30 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  AiOutlineCloudUpload,
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlineLoading,
+  AiOutlineCloudUpload,
 } from "react-icons/ai";
-import { Modal, TextField, Button, InputAdornment } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  MenuItem,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
-
-const StyledModal = styled(Modal)({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-});
-
-const ModalContent = styled("div")({
-  backgroundColor: "white",
-  padding: "20px",
-  borderRadius: "8px",
-  width: "80%",
-  maxWidth: "600px",
-  maxHeight: "85vh",
-  overflowY: "auto",
-});
+import CloudinaryUpload from "../../../redux/CloudinaryUpload";
+import { toast } from "react-toastify";
+import InvestorProfileModal from "./InvestorProfileModal";
+import ResponseModal from "../ResponseModal";
+import {
+  createInvestorProfile,
+  fetchInvestorProfile,
+} from "../../../redux/actions/profileActions";
+import { useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
+import InfoModal from "../InfoModal";
+/* eslint no-unused-vars: 0 */
 
 const ReadOnlyTextField = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -39,7 +41,39 @@ const ReadOnlyTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-function InvestorProfile() {
+const ReadOnlyTextFieldComponent = ({
+  label,
+  value,
+  onChange,
+  onEdit,
+  ...props
+}) => {
+  return (
+    <TextField
+      fullWidth
+      label={label}
+      variant="standard"
+      value={value}
+      onChange={onChange}
+      margin="normal"
+      InputProps={{
+        endAdornment: (
+          <Button onClick={onEdit} className="absolute right">
+            <AiOutlineEdit />
+          </Button>
+        ),
+        readOnly: true,
+        style: {
+          cursor: "not-allowed",
+        },
+      }}
+      {...props}
+    />
+  );
+};
+
+const InvestorProfile = () => {
+  const [open, setOpen] = useState(false);
   const [profileImage, setProfileImage] = useState("");
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -48,13 +82,34 @@ function InvestorProfile() {
   const [investmentExperience, setInvestmentExperience] = useState("");
   const [expectation, setExpectation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [open, setOpen] = useState(false);
   const [editField, setEditField] = useState("");
   const [meansOfId, setMeansOfId] = useState(null);
   const [meansOfIdName, setMeansOfIdName] = useState("");
   const [isFileUploadEditable, setIsFileUploadEditable] = useState(false);
-  const [fileUploadError, setFileUploadError] = useState(""); 
+  const [fileUploadError, setFileUploadError] = useState("");
+  const [profile, setProfile] = useState({});
 
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [responseModalOpen, setResponseModalOpen] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+
+  const [initialDirectorFile, setInitialDirectorFile] = useState("");
+  const [initialCacFile, setInitialCacFile] = useState("");
+  const [initialMemartFile, setInitialMemartFile] = useState("");
+
+  useEffect(() => {
+    setInitialDirectorFile(meansOfId);
+    setInitialCacFile(meansOfId);
+    setInitialMemartFile(meansOfId);
+  }, [meansOfId]);
+
+  const dispatch = useDispatch();
+
+  const location = useLocation();
+  const UniqueId = location.state?.uniqueId;
+  console.log(UniqueId);
+  // const token = location.state.token;
+  // console.log(token);
 
   const inputRefs = {
     fullName: useRef(null),
@@ -66,41 +121,62 @@ function InvestorProfile() {
   };
 
   useEffect(() => {
-    const savedProfileImage = localStorage.getItem("profileImage");
-    const savedFullName = localStorage.getItem("fullName");
-    const savedPhonenumber = localStorage.getItem("phoneNumber");
-    const savedEmail = localStorage.getItem("email");
-    const savedBvn = localStorage.getItem("bvn");
-    const savedInvestmentExperience = localStorage.getItem(
-      "investmentExperience"
-    );
-    const savedExpectation = localStorage.getItem("expectation");
+    if (UniqueId !== null && UniqueId !== undefined) {
+      const fetchUserProfile = async (UniqueId) => {
+        try {
+          const response = await dispatch(fetchInvestorProfile(UniqueId));
+          const userProfile = response.payload;
+          console.log(userProfile);
 
-    if (savedProfileImage) setProfileImage(savedProfileImage);
-    if (savedFullName) setFullName(savedFullName);
-    if (savedPhonenumber) setPhoneNumber(savedPhonenumber);
-    if (savedEmail) setEmail(savedEmail);
-    if (savedBvn) setBvn(savedBvn);
-    if (savedInvestmentExperience)
-      setInvestmentExperience(savedInvestmentExperience);
-    if (savedExpectation) setExpectation(savedExpectation);
-  }, []);
+          if (userProfile && userProfile.error) {
+            setProfileModalOpen(true);
+            return;
+          }
 
-  const handleImageUpload = (e) => {
+          if (userProfile) {
+            setProfile(userProfile);
+            console.log(userProfile);
+
+            updateComponentState(userProfile);
+          } else {
+            console.error("Error fetching profile:");
+            setProfileModalOpen(true);
+          }
+        } catch (error) {
+          console.error("Error fetching profile:", error.message || error);
+          setProfileModalOpen(true);
+        }
+      };
+
+      fetchUserProfile(UniqueId);
+    } else {
+      setProfileModalOpen(true);
+    }
+  }, [dispatch, UniqueId]);
+
+  const updateComponentState = (userProfile) => {
+    setFullName(userProfile.data.fullName);
+    setPhoneNumber(userProfile.data.phoneNumber);
+    setEmail(userProfile.data.email);
+    setBvn(userProfile.data.bvn);
+    setInvestmentExperience(userProfile.data.investmentExperience);
+    setExpectation(userProfile.data.expectation);
+    setMeansOfId(userProfile.data.meansOfId);
+    setProfileImage(userProfile.data.profileImage);
+  };
+
+  const handleImageUpload = async (e) => {
     const file = e.target.files ? e.target.files[0] : null;
     if (file) {
       setIsLoading(true);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result);
-        localStorage.setItem("profileImage", reader.result);
+      try {
+        const response = await CloudinaryUpload(file, "profile_images");
+        setProfileImage(response.secure_url);
         setIsLoading(false);
-      };
-      reader.onerror = () => {
-        console.error("Error reading file");
+      } catch (error) {
+        console.error("Error uploading profile image to Cloudinary", error);
         setIsLoading(false);
-      };
-      reader.readAsDataURL(file);
+      }
     } else {
       console.error("No file selected or file input is undefined");
     }
@@ -108,7 +184,11 @@ function InvestorProfile() {
 
   const handleRemoveImage = () => {
     setProfileImage("");
-    localStorage.removeItem("profileImage");
+  };
+
+  const handleSave = () => {
+    handleCreateProfile();
+    setOpen(false);
   };
 
   const handleEdit = (field) => {
@@ -116,58 +196,60 @@ function InvestorProfile() {
     if (inputRefs[field] && inputRefs[field].current) {
       inputRefs[field].current.focus();
     }
-    if (field === "meansOfId") {
-      setIsFileUploadEditable(true);
-    }
     setOpen(true);
   };
 
-  const handleSave = () => {
-    localStorage.setItem("fullName", fullName);
-    localStorage.setItem("phoneNumber", phoneNumber);
-    localStorage.setItem("email", email);
-    localStorage.setItem("bvn", bvn);
-    localStorage.setItem("investmentExperience", investmentExperience);
-    localStorage.setItem("expectation", expectation);
-    setIsFileUploadEditable(false);
-    setOpen(false);
-  };
-
-  const getFromLocalStorage = (key) => {
-    const value = localStorage.getItem(key);
-    return value ? JSON.parse(value) : null;
-  };
-
-  const saveToLocalStorage = (key, value) => {
-    localStorage.setItem(key, JSON.stringify(value));
-  };
-
-  useEffect(() => {
-    const savedMeansOfId = getFromLocalStorage("meansOfId");
-    if (savedMeansOfId) {
-      setMeansOfId(savedMeansOfId.data);
-      setMeansOfIdName(savedMeansOfId.name);
-    }
-  }, []);
-
-   const handleFileUpload = (event, setFileState, key) => {
+  const handleFileUpload = async (event, setFileState, field) => {
     const file = event.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { 
-        setFileUploadError("File size exceeds limit");
-        return;
+      try {
+        const response = await CloudinaryUpload(file, "users_documents");
+        setFileState(response.secure_url);
+      } catch (error) {
+        console.error("Error uploading file to Cloudinary", error);
+        toast.error("Error uploading file. Please try again.");
       }
-      const reader = new FileReader();
-      reader.onload = () => {
-        const fileData = reader.result;
-        setFileState(fileData);
-        setFileUploadError(""); 
-        saveToLocalStorage(key, { data: fileData, name: file.name });
-      };
-      reader.readAsDataURL(file);
     }
   };
-  
+
+  const handleCreateProfile = async () => {
+    setIsLoading(true);
+    setResponseModalOpen(true);
+    setResponseMessage("Saving profile...");
+
+    try {
+      const profileData = {
+        uniqueId: UniqueId,
+        fullName,
+        phoneNumber,
+        email,
+        bvn,
+        investmentExperience,
+        expectation,
+        meansOfId,
+        profileImage,
+      };
+
+      const response = await dispatch(createInvestorProfile(profileData));
+
+      if (response.error) {
+        throw new Error(`Error creating profile: ${response.error}`);
+      }
+
+      if (response.data && response.data.data) {
+        const newProfile = response.data.data;
+        setProfile(newProfile);
+        setResponseMessage("Profile created successfully!");
+      } else {
+        setResponseMessage("Profile created successfully!");
+      }
+    } catch (error) {
+      console.error("Error creating profile:", error);
+      setResponseMessage(`Error creating profile: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -228,7 +310,7 @@ function InvestorProfile() {
             <AiOutlineLoading className="text-lime-500 animate-spin mb-2" />
           )}
           <p className="text-center text-primary font-medium text-xl">
-            {fullName || "Investor"}
+            {fullName || "Full Name"}
           </p>
         </div>
 
@@ -236,275 +318,146 @@ function InvestorProfile() {
           <div className="space-y-4">
             <div className="flex flex-col lg:flex-row lg:gap-4">
               <div className="relative w-full">
-                <ReadOnlyTextField
-                  fullWidth
-                  label="Full name"
-                  variant="outlined"
+                <ReadOnlyTextFieldComponent
+                  label="Full Name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  margin="normal"
-                  InputProps={{
-                    endAdornment: (
-                      <Button
-                        onClick={() => handleEdit("fullName")}
-                        className="absolute right"
-                      >
-                        <AiOutlineEdit />
-                      </Button>
-                    ),
-                    readOnly: true,
-                  }}
+                  onEdit={() => handleEdit("fullName")}
                 />
               </div>
             </div>
 
             <div className="relative">
-              <ReadOnlyTextField
-                fullWidth
-                label="Email"
-                variant="outlined"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                margin="normal"
-                InputProps={{
-                  endAdornment: (
-                    <Button
-                      onClick={() => handleEdit("email")}
-                      className="absolute right"
-                    >
-                      <AiOutlineEdit />
-                    </Button>
-                  ),
-                  readOnly: true,
-                }}
-              />
-            </div>
-            <div className="relative">
-              <ReadOnlyTextField
-                fullWidth
-                label="Phone number"
-                variant="outlined"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                margin="normal"
-                InputProps={{
-                  endAdornment: (
-                    <Button
-                      onClick={() => handleEdit("phoneNumber")}
-                      className="absolute right"
-                    >
-                      <AiOutlineEdit />
-                    </Button>
-                  ),
-                  readOnly: true,
-                }}
-              />
-            </div>
-
-            <div className="flex flex-col lg:flex-row lg:gap-4">
-              <div className="relative w-full">
-                <ReadOnlyTextField
-                  fullWidth
-                  label="Investment Experience"
-                  variant="outlined"
-                  value={investmentExperience}
-                  onChange={(e) => setInvestmentExperience(e.target.value)}
-                  margin="normal"
-                  InputProps={{
-                    endAdornment: (
-                      <Button
-                        onClick={() => handleEdit("investmentExperience")}
-                        className="absolute right"
-                      >
-                        <AiOutlineEdit />
-                      </Button>
-                    ),
-                    readOnly: true,
-                  }}
-                />
-              </div>
-              <div className="relative w-full">
-                <ReadOnlyTextField
-                  fullWidth
-                  label="BVN"
-                  variant="outlined"
-                  value={bvn}
-                  onChange={(e) => setBvn(e.target.value)}
-                  margin="normal"
-                  InputProps={{
-                    endAdornment: (
-                      <Button
-                        onClick={() => handleEdit("bvn")}
-                        className="absolute right"
-                      >
-                        <AiOutlineEdit />
-                      </Button>
-                    ),
-                    readOnly: true,
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="relative">
-              <ReadOnlyTextField
-                fullWidth
-                label="Your Expectation"
-                variant="outlined"
-                multiline
-                rows={4}
-                value={expectation}
-                onChange={(e) => setExpectation(e.target.value)}
-                margin="normal"
-                InputProps={{
-                  endAdornment: (
-                    <Button
-                      onClick={() => handleEdit("expectation")}
-                      className="absolute right"
-                    >
-                      <AiOutlineEdit />
-                    </Button>
-                  ),
-                  readOnly: true,
-                }}
-              />
-            </div>
-
-            <div className="relative">
-              <p className="mb-4">
-                Means of Identification(National ID/NIN/Driver's License/Intn'l
-                Passport)
-              </p>
-              <ReadOnlyTextField
-                fullWidth
-                label="Means of Identification"
-                variant="outlined"
-                value={meansOfId ? "File Uploaded" : "No File Uploaded"}
-                InputProps={{
-                  endAdornment: (
-                    <Button
-                      onClick={() => handleEdit("meansOfId")}
-                      className="absolute right"
-                    >
-                      <AiOutlineEdit />
-                    </Button>
-                  ),
-                  readOnly: true,
-                }}
-              />
-            </div>
-          </div>
-
-          <StyledModal open={open} onClose={() => setOpen(false)}>
-            <ModalContent>
-              <h2 className="text-l text-primary font-semibold mb-4">
-                Edit Profile
-              </h2>
-              <TextField
-                fullWidth
-                label="Full Name"
-                variant="outlined"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                margin="normal"
-                ref={inputRefs.fullName}
-              />
-              <TextField
-                fullWidth
+              <ReadOnlyTextFieldComponent
                 label="Phone Number"
-                variant="outlined"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                margin="normal"
-                ref={inputRefs.phoneNumber}
+                onEdit={() => handleEdit("phoneNumber")}
               />
-              <TextField
-                fullWidth
+            </div>
+
+            <div className="relative">
+              <ReadOnlyTextFieldComponent
                 label="Email"
-                variant="outlined"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                margin="normal"
-                ref={inputRefs.email}
+                onEdit={() => handleEdit("email")}
               />
+            </div>
 
-              <TextField
-                fullWidth
-                label="Investment Experience"
-                variant="outlined"
-                value={investmentExperience}
-                onChange={(e) => setInvestmentExperience(e.target.value)}
-                margin="normal"
-                ref={inputRefs.investmentExperience}
-              />
-              <TextField
-                fullWidth
+            <div className="relative">
+              <ReadOnlyTextFieldComponent
                 label="BVN"
-                variant="outlined"
                 value={bvn}
                 onChange={(e) => setBvn(e.target.value)}
-                margin="normal"
-                ref={inputRefs.bvn}
+                onEdit={() => handleEdit("bvn")}
               />
+            </div>
 
-              <TextField
-                fullWidth
-                label="Your Expectation"
-                variant="outlined"
-                multiline
-                rows={4}
+            <div className="relative">
+              <ReadOnlyTextFieldComponent
+                label="Investment Experience"
+                value={investmentExperience}
+                onChange={(e) => setInvestmentExperience(e.target.value)}
+                onEdit={() => handleEdit("investmentExperience")}
+              />
+            </div>
+
+            <div className="relative">
+              <ReadOnlyTextFieldComponent
+                label="Expectation"
                 value={expectation}
                 onChange={(e) => setExpectation(e.target.value)}
-                margin="normal"
-                ref={inputRefs.expectation}
+                onEdit={() => handleEdit("expectation")}
               />
+            </div>
 
-              <div className="details-section">
-                <hr className="my-4 border-primary" />
-                <p className="mb-4 text-xs">
-                  Means of Identification(National ID/NIN/Driver's
-                  License/Intn'l Passport)
-                </p>
-                <TextField
-                  fullWidth
-                  label="Means of Identification"
-                  variant="outlined"
-                  type="file"
-                  accept=".jpeg,.jpg,.png,.pdf"
-                  onChange={(e) =>
-                    handleFileUpload(
-                      e,
-                      setMeansOfId,
-                      setMeansOfIdName,
-                      "meansOfId"
-                    )
-                  }
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
+            <div className="details-section">
+              <hr className="my-4 border-primary" />
+
+              <h3 className="block text-sm font-medium text-gray-700 mb-2">
+                Means of Identification
+              </h3>
+
+              <div className="flex flex-wrap gap-4">
+                <div className="w-full sm:w-1/3 px-2 mb-4">
+                  <label
+                    htmlFor="means-of-id-upload"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Upload Means of Identification
+                  </label>
+                  {meansOfId && typeof meansOfId === "string" ? (
+                    <div className="flex items-center border rounded-md border-gray-300 p-2">
+                      <span className="block w-full text-sm text-gray-500">
+                        {meansOfId.substring(0, 20) + "..."}
+                      </span>
+                      <i className="text-gray-500">
                         <AiOutlineCloudUpload />
-                      </InputAdornment>
-                    ),
-                  }}
-                  ref={inputRefs.meansOfId}
-                />
-                {fileUploadError && <p className="text-red-500 text-sm">{fileUploadError}</p>}
+                      </i>
+                    </div>
+                  ) : (
+                    <div className="flex items-center border rounded-md border-gray-300 p-2">
+                      <input
+                        type="file"
+                        id="means-of-id-upload"
+                        accept=".pdf, .jpg, .jpeg, .png,"
+                        onChange={(e) =>
+                          handleFileUpload(e, setMeansOfId, "meansOfId")
+                        }
+                        className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
+                      />
+                      <i className="text-gray-500">
+                        <AiOutlineCloudUpload />
+                      </i>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="mt-4 flex justify-end">
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSave}
-                >
-                  Save
-                </Button>
-              </div>
-            </ModalContent>
-          </StyledModal>
+            </div>
+          </div>
         </div>
+
+        <InvestorProfileModal
+          open={open}
+          setOpen={setOpen}
+          fullName={fullName}
+          setFullName={setFullName}
+          phoneNumber={phoneNumber}
+          setPhoneNumber={setPhoneNumber}
+          email={email}
+          setEmail={setEmail}
+          bvn={bvn}
+          setBvn={setBvn}
+          investmentExperience={investmentExperience}
+          setInvestmentExperience={setInvestmentExperience}
+          expectation={expectation}
+          setExpectation={setExpectation}
+          meansOfId={meansOfId}
+          setMeansOfId={setMeansOfId}
+          handleSave={handleSave}
+        />
+
+        <ResponseModal
+          isOpen={responseModalOpen}
+          toggle={() => setResponseModalOpen(false)}
+          message={responseMessage}
+          status={
+            responseMessage.includes("successfully") ? "success" : "error"
+          }
+          isLoading={isLoading}
+        />
+
+        <InfoModal
+          isOpen={profileModalOpen}
+          toggle={() => setProfileModalOpen(false)}
+          title="Complete Your Profile"
+          message="Please complete your profile to proceed."
+          buttonText="OK"
+        />
       </div>
     </div>
   );
-}
+};
 
 export default InvestorProfile;
