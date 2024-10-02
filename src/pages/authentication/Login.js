@@ -44,6 +44,7 @@ const Login = () => {
       const response = await dispatch(signin({ email, password }));
       if (response.type === 'SIGNIN_SUCCESS') {
         const uniqueId = response.payload.data.uniqueId;
+        localStorage.setItem("uniqueId", uniqueId);
         const token = response.payload.data.jwt.jsonWebToken;
         const role = response.payload.data.role; 
             

@@ -31,7 +31,7 @@ const ForgotPassword = () => {
         <h2 className="text-xl font-medium text-primary text-center mb-6">Forgot Password?</h2>
         <form onSubmit={handleSubmit}>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Enter your email to receive reset link
+            Enter your email to receive a reset link
           </label>
           <input
             type="email"

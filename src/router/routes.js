@@ -8,7 +8,11 @@ import NewPasswordSetup from "../pages/authentication/NewPasswordSetup";
 import EmailVerified from "../pages/authentication/EmailVerified";
 import InvestorProfile from "../pages/authentication/investorProfile/InvestorProfile";
 import NotFound from "../pages/authentication/NotFound";
-import DummyDashboard from "../pages/authentication/DummyDashboard";
+// import DummyDashboard from "../pages/authentication/DummyDashboard";
+import CreateProject from "../pages/dashboard/createProject/CreateProject";
+import Sidebar from "../pages/dashboard/Sidebar";
+import CreateProject2 from "../pages/dashboard/createProject/CreateProject2";
+import CreateProject3 from "../pages/dashboard/createProject/CreateProject3";
 
 const ROUTES = [
   {
@@ -69,7 +73,25 @@ const ROUTES = [
     path: "/dashboard",
     key: "Dashboard",
     exact: true,
-    element: <DummyDashboard />,
+    element: <Sidebar />,
+  },
+  {
+    path: "/create-project",
+    key: "CreateProject",
+    exact: true,
+    element: <CreateProject />,
+  },
+  {
+    path: "/create-project-page2",
+    key: "CreateProject2",
+    exact: true,
+    element: <CreateProject2 />,
+  },
+  {
+    path: "/create-project-page3",
+    key: "CreateProject3",
+    exact: true,
+    element: <CreateProject3 />,
   },
   {
     path: "*",
