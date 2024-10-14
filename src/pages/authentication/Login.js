@@ -3,6 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { signin } from "../../redux/actions/signInActions";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import {
+  fetchDeveloperProfile,
+  fetchInvestorProfile,
+} from "../../redux/actions/profileActions";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,7 +17,7 @@ const Login = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [response, setResponse] = useState({}); 
+  const [response, setResponse] = useState({});
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,54 +26,80 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     setLoading(true);
     setEmailError("");
     setPasswordError("");
-
+  
     if (!email) {
       setEmailError("Email is required");
+      setLoading(false);
       return;
     }
     if (!validateEmail(email)) {
       setEmailError("Invalid email format");
+      setLoading(false);
       return;
     }
     if (!password) {
       setPasswordError("Password is required");
+      setLoading(false);
       return;
     }
-
+  
     try {
       const response = await dispatch(signin({ email, password }));
-      if (response.type === 'SIGNIN_SUCCESS') {
+      if (response.type === "SIGNIN_SUCCESS") {
         const uniqueId = response.payload.data.uniqueId;
         localStorage.setItem("uniqueId", uniqueId);
         const token = response.payload.data.jwt.jsonWebToken;
-        const role = response.payload.data.role; 
-            
-        setResponse(response); 
+        const role = response.payload.data.role;
+  
+        setResponse(response);
         setLoading(false);
-        setIsModalOpen(true); 
-      
-        setTimeout(() => {
-          if (role === 'DEVELOPER') {
-            navigate("/profile-developer", {
-              state: { uniqueId: uniqueId, token: token },
-            });
+        setIsModalOpen(true);
+  
+        try {
+          let userProfileResponse =
+            role === "DEVELOPER"
+              ? await dispatch(fetchDeveloperProfile(uniqueId))
+              : await dispatch(fetchInvestorProfile(uniqueId));
+  
+          const userProfile = userProfileResponse?.payload?.data;
+  
+          // Check if the profile exists based on essential fields or status
+          if (userProfile && userProfile.username) {
+            // Profile exists, navigate to dashboard
+            navigate("/invD", { state: { uniqueId: uniqueId, token: token } });
           } else {
-            navigate("/profile-investor", {
-              state: { uniqueId: uniqueId, token: token },
-            });
+            // Profile doesn't exist or is incomplete, navigate to profile creation
+            if (role === "DEVELOPER") {
+              navigate("/profile-developer", { state: { uniqueId: uniqueId, token: token } });
+            } else {
+              navigate("/profile-investor", { state: { uniqueId: uniqueId, token: token } });
+            }
           }
-        }, 3000);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+          // If fetching the profile fails, navigate to the profile creation page
+          if (role === "DEVELOPER") {
+            navigate("/profile-developer", { state: { uniqueId: uniqueId, token: token } });
+          } else {
+            navigate("/profile-investor", { state: { uniqueId: uniqueId, token: token } });
+          }
+        }
+      } else {
+        setPasswordError("Signin failed!");
+        setLoading(false);
+        setIsModalOpen(true);
       }
     } catch (error) {
-      setPasswordError(error.payload || "Signin failed!"); 
+      setPasswordError(error.payload || "Signin failed!");
       setLoading(false);
       setIsModalOpen(true);
+    }
   };
-};
+  
   
 
   return (
@@ -139,7 +169,7 @@ const Login = () => {
           <button
             type="submit"
             className="w-full bg-[#467D9A] hover:bg-secondary text-white font-medium py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            disabled={loading} 
+            disabled={loading}
           >
             {loading ? (
               <div className="flex items-center justify-center">
@@ -167,13 +197,10 @@ const Login = () => {
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-            {response.type === 'SIGNIN_SUCCESS' ? (
+            {response.type === "SIGNIN_SUCCESS" ? (
               <div className="flex flex-col items-center">
                 <FaCheckCircle className="text-green-500 text-4xl mb-3" />
                 <p className="text-lg font-semibold">Sign in successful!</p>
-                <p className="text-gray-500 mt-2 text-center leading-tight">
-                  You will be redirected to your profile page.
-                </p>
               </div>
             ) : (
               <div className="flex flex-col items-center">
@@ -190,6 +217,5 @@ const Login = () => {
     </div>
   );
 };
-
 
 export default Login;

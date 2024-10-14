@@ -8,8 +8,11 @@ import useLocalStorage from "./useLocalStorage";
 
 const CreateProject = () => {
   const location = useLocation();
-  const uniqueId =
-    location?.state?.uniqueId || localStorage.getItem("uniqueId");
+  const uniqueId = location.state;
+  // const uniqueId =
+  //   location?.state?.uniqueId || localStorage.getItem("uniqueId");
+
+ 
 
   const initialFormData = {
     userUniqueId: uniqueId,
