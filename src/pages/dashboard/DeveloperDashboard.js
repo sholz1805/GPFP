@@ -1,14 +1,12 @@
 import React from "react";
 import {
-  FaChartLine,
-  // FaChartLine,
   FaMoneyBillWave,
-  // FaPlus,
-  FaProjectDiagram,
+  FaPlus,
 } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { GrProjects } from "react-icons/gr";
+import { RiFundsBoxFill } from "react-icons/ri";
 import { TbFileReport } from "react-icons/tb";
 
 const TableComponent = ({ title, columns, data }) => {
@@ -95,35 +93,32 @@ const Card = ({ icon, figure, details }) => {
   );
 };
 
-const InvestorDashboard = () => {
+const DeveloperDashboard = () => {
   const projectListColumns = [
+    "Date",
     "ProjectId",
     "ProjectName",
-    "Location",
-    "Amount Invested",
+    "ProjectType",
     "Developer",
   ];
   const projectListData = [
-    ["GP1001","LightUp Lagos",  "Lagos", "Type 1", "WaveLenght"],
-    ["GP1002", "Abuja TradeFair", "Abuja", "Type 2", "GreenDream"],
-    ["GP1003", "GreenBenue", "Benue", "Type 3", "GreenTrade"],
-    ["GP1004","LightUp ABJ",  "Abuja", "Type 3", "Power Up"],
-    ["GP1005", "KogiNG", "Kogi", "Type 3", "Go Nigeria"],
-    ["GP1006", "LightUp Ibadan", "Ibadan", "Type 3", "WaveLenght"],
-    ["GP1007", "LightUp Osun",  "Osun", "Type 3", "WaveLenght"],
-    ["GP1008", "Ogun SolarPower",  "Ogun", "Type 3", "Power Up"],
-    ["GP1009", "Green Edo",  "Edo", "Type 3", "GreenDream"],
-    ["GP10010", "Borno Trafe Fair", "Borno", "Type 2", "GreenDream"],
-    ["GP10011", "Green Borno", "Jos", "Type 2", "GreenTrade"],
-    ["GP10012", "LightUp Jos", "Jos", "Type 2", "Power Up"],
+    ["2022-01-01", "PID-001", "Project 1", "Type 1", "John Doe"],
+    ["2022-01-15", "PID-002", "Project 2", "Type 2", "Jane Doe"],
+    ["2022-02-01", "PID-003", "Project 3", "Type 3", "Bob Smith"],
+    ["2022-02-01", "PID-003", "Project 3", "Type 3", "Bob Smith"],
+    ["2022-02-01", "PID-003", "Project 3", "Type 3", "Bob Smith"],
+    ["2022-02-01", "PID-003", "Project 3", "Type 3", "Bob Smith"],
+    ["2022-02-01", "PID-003", "Project 3", "Type 3", "Bob Smith"],
+    ["2022-02-01", "PID-003", "Project 3", "Type 3", "Bob Smith"],
+    ["2022-01-15", "PID-002", "Project 2", "Type 2", "Jane Doe"],
+    ["2022-01-15", "PID-002", "Project 2", "Type 2", "Jane Doe"],
+    ["2022-01-15", "PID-002", "Project 2", "Type 2", "Jane Doe"],
   ];
 
   const navigate = useNavigate();
-  const handleViewProject = () => {
-    navigate("/project-list");
+  const handleCreateProject = () => {
+    navigate("/create-project");
   };
-
-  const handleViewReport = () => {};
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -134,14 +129,14 @@ const InvestorDashboard = () => {
               alt="img"
               className="rounded-full w-40 h-40"
               height="50"
-              src="https://storage.googleapis.com/a1aa/image/GaqxeEfNkIqLN0jXez0WfHh9OrDtmNce36cmQ07HQ8xkFmYcC.jpg"
+                src="https://storage.googleapis.com/a1aa/image/GaqxeEfNkIqLN0jXez0WfHh9OrDtmNce36cmQ07HQ8xkFmYcC.jpg"
               width="50"
             />
           </div>
           <div className="flex justify-center">
             <div>
               <h2 className="text-base font-semibold text-center">
-                Chief 
+                Sholz Creatives
               </h2>
               <p className="text-xs text-gray-600 text-center">
                 Lagos, Nigeria
@@ -152,26 +147,23 @@ const InvestorDashboard = () => {
             </div>
           </div>
           <div className="bg-gray-100 p-2 rounded-lg my-6">
+          <div className="mb-2">
+              <button className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex items-center  hover:bg-secondary">
+                <GrProjects className="mr-2" />
+                View All Projects
+              </button>
+            </div>
+            <div className="mb-2">
+              <button
+                onClick={handleCreateProject}
+                className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex  hover:bg-secondary items-center"
+              >
+                <FaPlus className="mr-2" />
+                Create Project
+              </button>
+            </div>
             <div className="mb-2">
               <button className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex items-center  hover:bg-secondary">
-                <FaChartLine className="mr-2" />
-                My Portfolio
-              </button>
-            </div>
-            <div className="mb-2">
-              <button
-                onClick={handleViewProject}
-                className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex  hover:bg-secondary items-center"
-              >
-                <GrProjects className="mr-2" />
-                View Projects
-              </button>
-            </div>
-            <div className="mb-2">
-              <button
-                onClick={handleViewReport}
-                className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex  hover:bg-secondary items-center"
-              >
                 <TbFileReport className="mr-2" />
                 View Report
               </button>
@@ -189,20 +181,20 @@ const InvestorDashboard = () => {
             <Card
               icon={<GrProjects size={14} color="#467D9A" />}
               title="Projects"
-              figure={11}
+              figure={65}
               details="Total Projects"
             />
             <Card
               icon={<FaMoneyBillWave size={14} color="#467D9A" />}
-              title="Investment"
+              title="TotalInvestment"
               figure={formatNumber(5000000500)}
-              details="Total Investment"
+              details="Total Investment Requested"
             />
             <Card
-              icon={<FaProjectDiagram size={14} color="#467D9A" />}
-              title="ActiveProject"
-              figure={50}
-              details="Active Projects"
+              icon={<RiFundsBoxFill size={14} color="#467D9A" />}
+              title="TotalRaised"
+              figure={formatNumber(3000000070)}
+              details="Total Investement Raised"
             />
           </div>
           <TableComponent
@@ -216,4 +208,4 @@ const InvestorDashboard = () => {
   );
 };
 
-export default InvestorDashboard;
+export default DeveloperDashboard;

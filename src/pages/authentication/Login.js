@@ -26,11 +26,11 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     setLoading(true);
     setEmailError("");
     setPasswordError("");
-  
+
     if (!email) {
       setEmailError("Email is required");
       setLoading(false);
@@ -46,7 +46,7 @@ const Login = () => {
       setLoading(false);
       return;
     }
-  
+
     try {
       const response = await dispatch(signin({ email, password }));
       if (response.type === "SIGNIN_SUCCESS") {
@@ -54,38 +54,50 @@ const Login = () => {
         localStorage.setItem("uniqueId", uniqueId);
         const token = response.payload.data.jwt.jsonWebToken;
         const role = response.payload.data.role;
-  
+
         setResponse(response);
         setLoading(false);
         setIsModalOpen(true);
-  
+
         try {
           let userProfileResponse =
             role === "DEVELOPER"
               ? await dispatch(fetchDeveloperProfile(uniqueId))
               : await dispatch(fetchInvestorProfile(uniqueId));
-  
+
           const userProfile = userProfileResponse?.payload?.data;
-  
-          // Check if the profile exists based on essential fields or status
+
           if (userProfile && userProfile.username) {
-            // Profile exists, navigate to dashboard
-            navigate("/invD", { state: { uniqueId: uniqueId, token: token } });
-          } else {
-            // Profile doesn't exist or is incomplete, navigate to profile creation
             if (role === "DEVELOPER") {
-              navigate("/profile-developer", { state: { uniqueId: uniqueId, token: token } });
+              navigate("/developer-dashboard", {
+                state: { uniqueId: uniqueId, token: token },
+              });
             } else {
-              navigate("/profile-investor", { state: { uniqueId: uniqueId, token: token } });
+              navigate("/investor-dashboard", {
+                state: { uniqueId: uniqueId, token: token },
+              });
+            }
+          } else {
+            if (role === "DEVELOPER") {
+              navigate("/profile-developer", {
+                state: { uniqueId: uniqueId, token: token },
+              });
+            } else {
+              navigate("/profile-investor", {
+                state: { uniqueId: uniqueId, token: token },
+              });
             }
           }
         } catch (error) {
           console.error("Error fetching profile:", error);
-          // If fetching the profile fails, navigate to the profile creation page
           if (role === "DEVELOPER") {
-            navigate("/profile-developer", { state: { uniqueId: uniqueId, token: token } });
+            navigate("/profile-developer", {
+              state: { uniqueId: uniqueId, token: token },
+            });
           } else {
-            navigate("/profile-investor", { state: { uniqueId: uniqueId, token: token } });
+            navigate("/profile-investor", {
+              state: { uniqueId: uniqueId, token: token },
+            });
           }
         }
       } else {
@@ -99,8 +111,6 @@ const Login = () => {
       setIsModalOpen(true);
     }
   };
-  
-  
 
   return (
     <div

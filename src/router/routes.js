@@ -14,7 +14,8 @@ import Sidebar from "../pages/dashboard/Sidebar";
 import CreateProject2 from "../pages/dashboard/createProject/CreateProject2";
 import CreateProject3 from "../pages/dashboard/createProject/CreateProject3";
 import InvestorDashboard from "../pages/dashboard/InvestorDashboard";
-import InvDashboard from "../pages/dashboard/InvDashboard";
+import ProjectList from "../pages/dashboard/ProjectList";
+import DeveloperDashboard from "../pages/dashboard/DeveloperDashboard";
 
 const ROUTES = [
   {
@@ -102,10 +103,22 @@ const ROUTES = [
     element: <NotFound />,
   },
   {
-    path: "/invD",
+    path: "/project-list",
     key: "InvestorDashboard",
     exact: true,
-    element: <InvDashboard />,
+    element: <ProjectList />,
+  },
+  {
+    path: "/investor-dashboard",
+    key: "InvestorDashboard",
+    exact: true,
+    element: <InvestorDashboard />,
+  },
+  {
+    path: "/developer-dashboard",
+    key: "InvestorDashboard",
+    exact: true,
+    element: <DeveloperDashboard />,
   },
   
 ];
