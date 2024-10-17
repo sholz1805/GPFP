@@ -18,7 +18,7 @@ const TableComponent = ({ title, columns, data }) => {
         <p className="text-l font-semibold text-primary mb-2">{title}</p>
       </div>
       <div
-        className="bg-white border border-gray-300 rounded-lg p-2 mb-4 overflow-y-auto scrollbar-hide"
+        className="bg-white border border-gray-300 rounded-lg p-2 overflow-y-auto scrollbar-hide"
         style={{ height: "65vh", width: "100%" }}
       >
         <table className="min-w-full bg-white ">
@@ -97,25 +97,24 @@ const Card = ({ icon, figure, details }) => {
 
 const InvestorDashboard = () => {
   const projectListColumns = [
-    "ProjectId",
-    "ProjectName",
+    "Project Id",
+    "Project Name",
     "Location",
     "Amount Invested",
     "Developer",
   ];
   const projectListData = [
-    ["GP1001","LightUp Lagos",  "Lagos", "Type 1", "WaveLenght"],
-    ["GP1002", "Abuja TradeFair", "Abuja", "Type 2", "GreenDream"],
-    ["GP1003", "GreenBenue", "Benue", "Type 3", "GreenTrade"],
-    ["GP1004","LightUp ABJ",  "Abuja", "Type 3", "Power Up"],
-    ["GP1005", "KogiNG", "Kogi", "Type 3", "Go Nigeria"],
-    ["GP1006", "LightUp Ibadan", "Ibadan", "Type 3", "WaveLenght"],
-    ["GP1007", "LightUp Osun",  "Osun", "Type 3", "WaveLenght"],
-    ["GP1008", "Ogun SolarPower",  "Ogun", "Type 3", "Power Up"],
-    ["GP1009", "Green Edo",  "Edo", "Type 3", "GreenDream"],
-    ["GP10010", "Borno Trafe Fair", "Borno", "Type 2", "GreenDream"],
-    ["GP10011", "Green Borno", "Jos", "Type 2", "GreenTrade"],
-    ["GP10012", "LightUp Jos", "Jos", "Type 2", "Power Up"],
+    ["GP1001","LightUp Lagos",  "Lagos", "200m", "WaveLenght"],
+    ["GP1002", "Abuja TradeFair", "Abuja", "100m", "GreenDream"],
+    ["GP1003", "GreenBenue", "Benue", "50m", "GreenTrade"],
+    ["GP1004","LightUp ABJ",  "Abuja", "150m", "Power Up"],
+    ["GP1005", "KogiNG", "Kogi", "250m", "Go Nigeria"],
+    ["GP1006", "LightUp Ibadan", "Ibadan", "20m", "WaveLenght"],
+    ["GP1007", "LightUp Osun",  "Osun", "50m", "WaveLenght"],
+    ["GP1008", "Ogun SolarPower",  "Ogun", "100m", "Power Up"],
+    ["GP1009", "Green Edo",  "Edo", "150m", "GreenDream"],
+    ["GP10010", "Borno Trafe Fair", "Borno", "100m", "GreenDream"],
+    ["GP10011", "Green Borno", "Jos", "50m", "GreenTrade"],
   ];
 
   const navigate = useNavigate();
@@ -141,13 +140,13 @@ const InvestorDashboard = () => {
           <div className="flex justify-center">
             <div>
               <h2 className="text-base font-semibold text-center">
-                Chief 
+                Chief Ben
               </h2>
               <p className="text-xs text-gray-600 text-center">
-                Lagos, Nigeria
+                Abuja, Nigeria
               </p>
               <p className="text-xs text-primary text-center">
-                sholzcreatives@gmail.com
+                chiefBen@gmail.com
               </p>
             </div>
           </div>
@@ -189,7 +188,7 @@ const InvestorDashboard = () => {
             <Card
               icon={<GrProjects size={14} color="#467D9A" />}
               title="Projects"
-              figure={11}
+              figure={20}
               details="Total Projects"
             />
             <Card
@@ -201,7 +200,7 @@ const InvestorDashboard = () => {
             <Card
               icon={<FaProjectDiagram size={14} color="#467D9A" />}
               title="ActiveProject"
-              figure={50}
+              figure={12}
               details="Active Projects"
             />
           </div>

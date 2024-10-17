@@ -89,10 +89,10 @@ const CreatePage3 = () => {
     setShowConfirmModal(false);
   };
 
-  const handleResponseClose = () => {
-    setShowResponseModal(false);
-    setLoading(false);
-  };
+  // const handleResponseClose = () => {
+  //   setShowResponseModal(false);
+  //   setLoading(false);
+  // };
 
   useEffect(() => {
     if (

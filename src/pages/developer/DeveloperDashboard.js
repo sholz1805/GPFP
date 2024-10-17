@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  FaMoneyBillWave,
-  FaPlus,
-} from "react-icons/fa";
+import { FaMoneyBillWave, FaPlus } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { GrProjects } from "react-icons/gr";
@@ -16,7 +13,7 @@ const TableComponent = ({ title, columns, data }) => {
         <p className="text-l font-semibold text-primary mb-2">{title}</p>
       </div>
       <div
-        className="bg-white border border-gray-300 rounded-lg p-2 mb-4 overflow-y-auto scrollbar-hide"
+        className="bg-white border border-gray-300 rounded-lg p-2 overflow-y-auto scrollbar-hide"
         style={{ height: "65vh", width: "100%" }}
       >
         <table className="min-w-full bg-white ">
@@ -95,24 +92,27 @@ const Card = ({ icon, figure, details }) => {
 
 const DeveloperDashboard = () => {
   const projectListColumns = [
-    "Date",
-    "ProjectId",
-    "ProjectName",
-    "ProjectType",
-    "Developer",
+    "Project Id",
+    "Project Name",
+    "Project Location",
+    "Start Date",
+    "Status",
   ];
   const projectListData = [
-    ["2022-01-01", "PID-001", "Project 1", "Type 1", "John Doe"],
-    ["2022-01-15", "PID-002", "Project 2", "Type 2", "Jane Doe"],
-    ["2022-02-01", "PID-003", "Project 3", "Type 3", "Bob Smith"],
-    ["2022-02-01", "PID-003", "Project 3", "Type 3", "Bob Smith"],
-    ["2022-02-01", "PID-003", "Project 3", "Type 3", "Bob Smith"],
-    ["2022-02-01", "PID-003", "Project 3", "Type 3", "Bob Smith"],
-    ["2022-02-01", "PID-003", "Project 3", "Type 3", "Bob Smith"],
-    ["2022-02-01", "PID-003", "Project 3", "Type 3", "Bob Smith"],
-    ["2022-01-15", "PID-002", "Project 2", "Type 2", "Jane Doe"],
-    ["2022-01-15", "PID-002", "Project 2", "Type 2", "Jane Doe"],
-    ["2022-01-15", "PID-002", "Project 2", "Type 2", "Jane Doe"],
+    ["GP10020", "Lagos TradeFair", "Lagos", "Sept 22", "Approved"],
+    ["GP10021", "LightUp Kano", "Kano", "Oct 14", "Pending"],
+    ["GP10022", "Green Jos", "Jos", "Apr 5", "Approved"],
+    ["GP10023", "Abuja Tradefair", "Abuja", "Feb 3", "Approved"],
+    ["GP10024", "Green Ogun", "Ogun", "Jul 12", "Aprroved"],
+    ["GP10025", "LightUp Ibadan", "Ibadan", "Jun 30", "Approved"],
+    ["GP10026", "LightUp Osun", "Osun", "Nov 10", "Pending"],
+    ["GP10027", "Green Abia", "Abia", "OCt 10", "Pending"],
+    ["GP10028", "Kogi Tradefair", "Kogi", "Jan 2", "Approved"],
+    ["GP10029", "Lagos VI Tradefair", "Lagos", "Oct 22", "Approved"],
+    ["GP10030", "Green Lagos", "Lagos", "Jan 1", "Approved"],
+    ["GP10031", "Green Ibadan", "Ibadan", "Dec 25", "Pending"],
+    ["GP10032", "Solar Powered Lagos", "Lagos", "Feb 19", "Approved"],
+    
   ];
 
   const navigate = useNavigate();
@@ -129,7 +129,7 @@ const DeveloperDashboard = () => {
               alt="img"
               className="rounded-full w-40 h-40"
               height="50"
-                src="https://storage.googleapis.com/a1aa/image/GaqxeEfNkIqLN0jXez0WfHh9OrDtmNce36cmQ07HQ8xkFmYcC.jpg"
+              src="https://storage.googleapis.com/a1aa/image/GaqxeEfNkIqLN0jXez0WfHh9OrDtmNce36cmQ07HQ8xkFmYcC.jpg"
               width="50"
             />
           </div>
@@ -147,7 +147,7 @@ const DeveloperDashboard = () => {
             </div>
           </div>
           <div className="bg-gray-100 p-2 rounded-lg my-6">
-          <div className="mb-2">
+            <div className="mb-2">
               <button className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex items-center  hover:bg-secondary">
                 <GrProjects className="mr-2" />
                 View All Projects

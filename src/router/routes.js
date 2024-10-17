@@ -9,13 +9,14 @@ import EmailVerified from "../pages/authentication/EmailVerified";
 import InvestorProfile from "../pages/authentication/investorProfile/InvestorProfile";
 import NotFound from "../pages/authentication/NotFound";
 // import DummyDashboard from "../pages/authentication/DummyDashboard";
-import CreateProject from "../pages/dashboard/createProject/CreateProject";
-import Sidebar from "../pages/dashboard/Sidebar";
-import CreateProject2 from "../pages/dashboard/createProject/CreateProject2";
-import CreateProject3 from "../pages/dashboard/createProject/CreateProject3";
-import InvestorDashboard from "../pages/dashboard/InvestorDashboard";
-import ProjectList from "../pages/dashboard/ProjectList";
-import DeveloperDashboard from "../pages/dashboard/DeveloperDashboard";
+import CreateProject from "../pages/developer/createProject/CreateProject";
+import Sidebar from "../pages/project/Sidebar";
+import CreateProject2 from "../pages/developer/createProject/CreateProject2";
+import CreateProject3 from "../pages/developer/createProject/CreateProject3";
+import ProjectList from "../pages/investor/ProjectList";
+import InvestorDashboard from "../pages/investor/InvestorDashboard";
+import DeveloperDashboard from "../pages/developer/DeveloperDashboard";
+import DashboardRoutes from "./DashboardRoutes";
 
 const ROUTES = [
   {
@@ -119,6 +120,12 @@ const ROUTES = [
     key: "InvestorDashboard",
     exact: true,
     element: <DeveloperDashboard />,
+  },
+  {
+    path: "/admin-dashboard/*",
+    key: "AdminDashboard",
+    exact: true,
+    element: <DashboardRoutes />,
   },
   
 ];

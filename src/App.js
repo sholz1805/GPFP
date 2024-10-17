@@ -7,7 +7,6 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Non-Dashboard Routes */}
         {ROUTES.map((route) => (
           <Route
             key={route.key}
@@ -17,7 +16,6 @@ const App = () => {
           />
         ))}
 
-        {/* Dashboard Routes */}
         <Route path="/*" element={<DashboardRoutes />} />
       </Routes>
     </Router>
