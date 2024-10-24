@@ -15,6 +15,8 @@ import ProjectList from "../pages/investor/ProjectList";
 import InvestorDashboard from "../pages/investor/InvestorDashboard";
 import DeveloperDashboard from "../pages/developer/DeveloperDashboard";
 import DashboardRoutes from "./DashboardRoutes";
+import FurtherInfoModal from "../pages/investor/FurtherInfoModal";
+import MessageBody from "../pages/admin/dashboard/MessageBody";
 
 const ROUTES = [
   {
@@ -88,6 +90,12 @@ const ROUTES = [
     key: "CreateProject3",
     exact: true,
     element: <CreateProject3 />,
+  },
+  {
+    path: "/test",
+    key: "Test",
+    exact: true,
+    element: <MessageBody />,
   },
   {
     path: "*",
