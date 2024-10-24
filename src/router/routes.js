@@ -8,9 +8,7 @@ import NewPasswordSetup from "../pages/authentication/NewPasswordSetup";
 import EmailVerified from "../pages/authentication/EmailVerified";
 import InvestorProfile from "../pages/authentication/investorProfile/InvestorProfile";
 import NotFound from "../pages/authentication/NotFound";
-// import DummyDashboard from "../pages/authentication/DummyDashboard";
 import CreateProject from "../pages/developer/createProject/CreateProject";
-import Sidebar from "../pages/project/Sidebar";
 import CreateProject2 from "../pages/developer/createProject/CreateProject2";
 import CreateProject3 from "../pages/developer/createProject/CreateProject3";
 import ProjectList from "../pages/investor/ProjectList";
@@ -74,12 +72,6 @@ const ROUTES = [
     element: <EmailVerified />,
   },
   {
-    path: "/dashboard",
-    key: "Dashboard",
-    exact: true,
-    element: <Sidebar />,
-  },
-  {
     path: "/create-project",
     key: "CreateProject",
     exact: true,
@@ -127,7 +119,6 @@ const ROUTES = [
     exact: true,
     element: <DashboardRoutes />,
   },
-  
 ];
 
 export default ROUTES;

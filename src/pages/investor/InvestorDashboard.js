@@ -177,9 +177,9 @@ const InvestorDashboard = () => {
             </div>
           </div>
           <div className="mt-auto">
-            <button className="text-primary w-full text-xs py-2 px-2 rounded-lg flex    items-center">
+            <button className="text-primary w-full text-sm py-2 px-2 rounded-lg flex    items-center">
               <IoMdSettings className="mr-2" />
-              Sign Out
+              Logout
             </button>
           </div>
         </div>

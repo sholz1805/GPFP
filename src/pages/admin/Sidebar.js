@@ -73,7 +73,7 @@ const Sidebar = () => {
                 }`}
               >
                 <VscProject size={20} />
-                <span>View Projects</span>
+                <span>Projects</span>
               </Link>
             </li>
             <li>
@@ -86,7 +86,7 @@ const Sidebar = () => {
                 }`}
               >
                 <AiOutlineMessage size={20} />
-                <span>View Messages</span>
+                <span>Messages</span>
               </Link>
             </li>
             <li>
@@ -99,7 +99,7 @@ const Sidebar = () => {
                 }`}
               >
                 <IoPeopleOutline size={20} />
-                <span>Investor Page</span>
+                <span>Investors</span>
               </Link>
             </li>
             <li>
@@ -112,7 +112,7 @@ const Sidebar = () => {
                 }`}
               >
                 <AiOutlineUsergroupAdd size={20} />
-                <span>Developer Page</span>
+                <span>Developers</span>
               </Link>
             </li>
             {/* <li>
