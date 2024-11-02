@@ -51,9 +51,11 @@ const Login = () => {
       const response = await dispatch(signin({ email, password }));
       if (response.type === "SIGNIN_SUCCESS") {
         const uniqueId = response.payload.data.uniqueId;
-        localStorage.setItem("uniqueId", uniqueId);
+        const email = response.payload.data.email;
         const token = response.payload.data.jwt.jsonWebToken;
         const role = response.payload.data.role;
+        // console.log(response);
+        localStorage.setItem('uniqueId', uniqueId)
 
         setResponse(response);
         setLoading(false);
@@ -66,15 +68,29 @@ const Login = () => {
               : await dispatch(fetchInvestorProfile(uniqueId));
 
           const userProfile = userProfileResponse?.payload?.data;
+          console.log(userProfile)
+          const companyName = userProfile?.companyName;
+          const profilePic = userProfile?.developerProfilePicture
 
           if (userProfile && userProfile.username) {
             if (role === "DEVELOPER") {
               navigate("/developer-dashboard", {
-                state: { uniqueId: uniqueId, token: token },
+                state: {
+                  uniqueId: uniqueId,
+                  token: token,
+                  companyName: companyName,
+                  email: email,
+                  profilePic : profilePic,
+                },
               });
             } else {
               navigate("/investor-dashboard", {
-                state: { uniqueId: uniqueId, token: token },
+                state: {
+                  uniqueId: uniqueId,
+                  token: token,
+                  companyName: companyName,
+                  email: email,
+                },
               });
             }
           } else {

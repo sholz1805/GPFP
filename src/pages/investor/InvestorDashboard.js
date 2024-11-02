@@ -133,7 +133,7 @@ const InvestorDashboard = () => {
               alt="img"
               className="rounded-full w-40 h-40"
               height="50"
-              src="https://storage.googleapis.com/a1aa/image/GaqxeEfNkIqLN0jXez0WfHh9OrDtmNce36cmQ07HQ8xkFmYcC.jpg"
+              src="https://cdn.prod.website-files.com/656da6fea306219773d04208/66bc6bb65045d2d90c4bd50a_image.avif"
               width="50"
             />
           </div>

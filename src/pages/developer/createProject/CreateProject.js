@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import NaijaStates from "naija-state-local-government";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,7 +12,9 @@ const CreateProject = () => {
   // const uniqueId =
   //   location?.state?.uniqueId || localStorage.getItem("uniqueId");
 
- 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const initialFormData = {
     userUniqueId: uniqueId,

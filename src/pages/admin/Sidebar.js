@@ -2,14 +2,12 @@ import { Link, useLocation } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { IoHomeOutline, IoPeopleOutline } from "react-icons/io5";
 import { VscProject } from "react-icons/vsc";
-import {
-  AiOutlineMessage,
-  AiOutlineUsergroupAdd,
-} from "react-icons/ai";
+import { AiOutlineMessage, AiOutlineUsergroupAdd } from "react-icons/ai";
 // import { MdDriveFolderUpload } from "react-icons/md";
 import { FiUploadCloud } from "react-icons/fi";
 import { LuLogOut } from "react-icons/lu";
 import { useState } from "react";
+import { useLogout } from "../authentication/authUtils/logoutUtil";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -28,8 +26,9 @@ const Sidebar = () => {
     setOpenModal(false);
   };
 
+  const logout = useLogout();
   const handleLogout = () => {
-    console.log("Logout");
+    logout();
   };
 
   return (

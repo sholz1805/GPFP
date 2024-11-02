@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaMoneyBillWave, FaPlus } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { GrProjects } from "react-icons/gr";
 import { RiFundsBoxFill } from "react-icons/ri";
 import { TbFileReport } from "react-icons/tb";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProjects } from "../../redux/actions/fetchAllProjectActions";
+import { useLogout } from "../authentication/authUtils/logoutUtil";
 
-const TableComponent = ({ title, columns, data }) => {
+const TableComponent = ({ title, columns, data, loading, error, onRowClick }) => {
   return (
     <>
       <div>
@@ -16,34 +19,52 @@ const TableComponent = ({ title, columns, data }) => {
         className="bg-white border border-gray-300 rounded-lg p-2 overflow-y-auto scrollbar-hide"
         style={{ height: "65vh", width: "100%" }}
       >
-        <table className="min-w-full bg-white ">
-          <thead>
-            <tr>
-              {columns.map((column, index) => (
-                <th
-                  key={index}
-                  className="text-left text-xs font-semibold text-primary py-6 px-2 border-b border-gray-300 border-b-2 border-primary"
-                >
-                  {column}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, index) => (
-              <tr key={index}>
-                {row.map((cell, index) => (
-                  <td
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <div className="loader">Loading...</div>
+          </div>
+        ) : error ? (
+          <div className="flex justify-center items-center h-full">
+            <p className="text-red-500 font-semibold">{error}</p>
+          </div>
+        ) : data.length === 0 ? (
+          <div className="flex justify-center items-center h-full">
+            <p className="text-black">No projects available.</p>
+          </div>
+        ) : (
+          <table className="min-w-full bg-white ">
+            <thead>
+              <tr>
+                {columns.map((column, index) => (
+                  <th
                     key={index}
-                    className="text-left text-xs py-3 px-2 border-b border-gray-300"
+                    className="text-left text-xs font-semibold text-primary py-6 px-2 border-b border-gray-300 border-b-2 border-primary"
                   >
-                    {cell}
-                  </td>
+                    {column}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.map((row, rowIndex) => (
+                <tr
+                  key={rowIndex}
+                  onClick={() => onRowClick(row[0])}
+                  className="cursor-pointer hover:bg-gray-100"
+                >
+                  {row.map((cell, cellIndex) => (
+                    <td
+                      key={cellIndex}
+                      className="text-left text-xs py-3 px-2 border-b border-gray-300"
+                    >
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </>
   );
@@ -98,30 +119,81 @@ const DeveloperDashboard = () => {
     "Start Date",
     "Status",
   ];
-  const projectListData = [
-    ["GP10020", "Lagos TradeFair", "Lagos", "Sept 22", "Approved"],
-    ["GP10021", "LightUp Kano", "Kano", "Oct 14", "Pending"],
-    ["GP10022", "Green Jos", "Jos", "Apr 5", "Approved"],
-    ["GP10023", "Abuja Tradefair", "Abuja", "Feb 3", "Approved"],
-    ["GP10024", "Green Ogun", "Ogun", "Jul 12", "Aprroved"],
-    ["GP10025", "LightUp Ibadan", "Ibadan", "Jun 30", "Approved"],
-    ["GP10026", "LightUp Osun", "Osun", "Nov 10", "Pending"],
-    ["GP10027", "Green Abia", "Abia", "OCt 10", "Pending"],
-    ["GP10028", "Kogi Tradefair", "Kogi", "Jan 2", "Approved"],
-    ["GP10029", "Lagos VI Tradefair", "Lagos", "Oct 22", "Approved"],
-    ["GP10030", "Green Lagos", "Lagos", "Jan 1", "Approved"],
-    ["GP10031", "Green Ibadan", "Ibadan", "Dec 25", "Pending"],
-    ["GP10032", "Solar Powered Lagos", "Lagos", "Feb 19", "Approved"],
-    
-  ];
+
+  // console.log("location details", location)
 
   const navigate = useNavigate();
   const handleCreateProject = () => {
     navigate("/create-project");
   };
 
+  const handleViewAllProject = () => {
+    navigate("/all-projects", {
+      state: {
+        uniqueId: UniqueId,
+      },
+    });
+  };
+
+  const handleRowClick = (projectId) => {
+    navigate(`/project-details/${projectId}`); 
+  };
+
+  const dispatch = useDispatch();
+  const projects = useSelector((state) => state.projects);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const location = useLocation();
+  const UniqueId = localStorage.getItem("uniqueId");
+  const [openModal, setOpenModal] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        await dispatch(fetchProjects(UniqueId));
+      } catch (err) {
+        setError("Failed to load projects. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [dispatch, UniqueId]);
+
+  const projectListData = projects.projects.map((project) => [
+    project.projectUniqueId,
+    project.projectName,
+    project.location,
+    new Date(project.startDate).toLocaleDateString(),
+    project.approved === true ? (
+      <span className="text-green-500">Approved</span>
+    ) : project.approved === false && project.uploadUrl === null ? (
+      <span className="text-yellow-500">Pending</span>
+    ) : (
+      <span className="text-red-500">Not Approved</span>
+    ),
+  ]);
+
+  const handleOpeModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const logout = useLogout();
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-gray-100 min-h-screen ">
       <div className="flex flex-col justify-center p-4 md:flex-row">
         <div className="w-full md:w-1/4 bg-white border border-gray-300 rounded-lg p-4 md:mx-2">
           <div className="mb-4 flex justify-center">
@@ -129,26 +201,29 @@ const DeveloperDashboard = () => {
               alt="img"
               className="rounded-full w-40 h-40"
               height="50"
-              src="https://storage.googleapis.com/a1aa/image/GaqxeEfNkIqLN0jXez0WfHh9OrDtmNce36cmQ07HQ8xkFmYcC.jpg"
+              src={location.state?.profilePic}
               width="50"
             />
           </div>
           <div className="flex justify-center">
             <div>
               <h2 className="text-base font-semibold text-center">
-                Sholz Creatives
+                {location.state?.companyName}
               </h2>
-              <p className="text-xs text-gray-600 text-center">
+              {/* <p className="text-xs text-gray-600 text-center">
                 Lagos, Nigeria
-              </p>
+              </p> */}
               <p className="text-xs text-primary text-center">
-                sholzcreatives@gmail.com
+                {location.state?.email}
               </p>
             </div>
           </div>
           <div className="bg-gray-100 p-2 rounded-lg my-6">
             <div className="mb-2">
-              <button className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex items-center  hover:bg-secondary">
+              <button
+                onClick={handleViewAllProject}
+                className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex items-center  hover:bg-secondary"
+              >
                 <GrProjects className="mr-2" />
                 View All Projects
               </button>
@@ -170,10 +245,36 @@ const DeveloperDashboard = () => {
             </div>
           </div>
           <div className="mt-auto">
-            <button className="text-primary w-full text-sm py-2 px-2 rounded-lg flex    items-center">
+            <button
+              className="text-primary w-full text-sm py-2 px-2 rounded-lg flex  items-center"
+              onClick={handleOpeModal}
+            >
               <IoMdSettings className="mr-2" />
               Logout
             </button>
+            {openModal && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                <div className="bg-white rounded-lg shadow-lg  p-6 max-w-sm w-full">
+                  <p className="text-gray-500 mt-2 text-center leading-tight ">
+                    Are you sure you want to logout?
+                  </p>
+                  <div className="flex items-center justify-center gap-5">
+                    <button
+                      onClick={handleLogout}
+                      className="bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark mt-4"
+                    >
+                      Yes, Logout
+                    </button>
+                    <button
+                      onClick={handleCloseModal}
+                      className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-primary-dark mt-4"
+                    >
+                      No, go back
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <div className="w-full md:w-3/4 md:mx-2">
@@ -201,6 +302,9 @@ const DeveloperDashboard = () => {
             title="Project List"
             columns={projectListColumns}
             data={projectListData}
+            loading={loading}
+            error={error}
+            onRowClick={handleRowClick}
           />
         </div>
       </div>

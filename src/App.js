@@ -1,11 +1,14 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import ROUTES from "./router/routes"; 
-import DashboardRoutes from "./router/DashboardRoutes"; 
+import ROUTES from "./router/routes";
+import DashboardRoutes from "./router/DashboardRoutes";
+import ScrollToTop from "./ScrollToTop";
+import ProtectedRoute from "./ProtectedRoute";
 
 const App = () => {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {ROUTES.map((route) => (
           <Route
@@ -15,8 +18,9 @@ const App = () => {
             element={route.element}
           />
         ))}
-
-        <Route path="/*" element={<DashboardRoutes />} />
+        <Route path="/*" element={<ProtectedRoute />}>
+          <Route path="/*" element={<DashboardRoutes />} />
+        </Route>
       </Routes>
     </Router>
   );

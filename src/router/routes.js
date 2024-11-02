@@ -15,8 +15,9 @@ import ProjectList from "../pages/investor/ProjectList";
 import InvestorDashboard from "../pages/investor/InvestorDashboard";
 import DeveloperDashboard from "../pages/developer/DeveloperDashboard";
 import DashboardRoutes from "./DashboardRoutes";
-import FurtherInfoModal from "../pages/investor/FurtherInfoModal";
 import MessageBody from "../pages/admin/dashboard/MessageBody";
+import ProjectTable from "../pages/developer/ProjectTable";
+import ProjectDetails from "../pages/developer/ProjectDetails";
 
 const ROUTES = [
   {
@@ -120,6 +121,18 @@ const ROUTES = [
     key: "InvestorDashboard",
     exact: true,
     element: <DeveloperDashboard />,
+  },
+  {
+    path: "/all-projects",
+    key: "Allprojects",
+    exact: true,
+    element: <ProjectTable />,
+  },
+  {
+    path: "/project-details/:projectId",
+    key: "ProjectDetails",
+    exact: true,
+    element: <ProjectDetails />,
   },
   {
     path: "/admin-dashboard/*",

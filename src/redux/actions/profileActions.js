@@ -129,7 +129,7 @@ export const fetchDeveloperProfile = (uniqueId) => {
       );
 
       dispatch(fetchProfileSuccess(response.data));
-      console.log(response.data);
+      // console.log(response.data);
 
       return Promise.resolve({
         type: FETCH_PROFILE_SUCCESS,
@@ -161,7 +161,7 @@ export const fetchInvestorProfile = (uniqueId) => {
       const response = await axios.get(baseUrl + endpoint + `${uniqueId}`);
 
       dispatch(fetchProfileSuccess(response.data));
-      console.log(response.data);
+      // console.log(response.data);
 
       return Promise.resolve({
         type: FETCH_PROFILE_SUCCESS,

@@ -32,6 +32,10 @@ const CreateProject2 = () => {
   
   });
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const handleRadioChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
