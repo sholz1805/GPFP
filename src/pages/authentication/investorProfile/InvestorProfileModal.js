@@ -28,20 +28,20 @@ const ModalContent = styled("div")({
 const InvestorProfileModal = ({
   open,
   setOpen,
-  fullName,
-  setFullName,
-  phoneNumber,
-  setPhoneNumber,
-  email,
-  setEmail,
+  // fullName,
+  // setFullName,
+  // phoneNumber,
+  // setPhoneNumber,
+  // email,
+  // setEmail,
   bvn,
   setBvn,
   investmentExperience,
   setInvestmentExperience,
   expectation,
   setExpectation,
-  meansOfId,
-  setMeansOfId,
+  identificationMeans,
+  setIdentificationMeans,
   handleSave,
 }) => {
   return (
@@ -49,7 +49,7 @@ const InvestorProfileModal = ({
       <ModalContent>
         <h2 className="text-l text-primary font-semibold mb-4">Edit Profile</h2>
 
-        <TextField
+        {/* <TextField
           fullWidth
           label="Full Name"
           variant="outlined"
@@ -72,7 +72,7 @@ const InvestorProfileModal = ({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           margin="normal"
-        />
+        /> */}
         <TextField
           fullWidth
           label="BVN"
@@ -113,7 +113,7 @@ const InvestorProfileModal = ({
                   type="file"
                   id="means-of-id-upload"
                   accept=".pdf, .jpg, .jpeg, .png,"
-                  onChange={(e) => setMeansOfId(e.target.files[0])}
+                  onChange={(e) => setIdentificationMeans(e.target.files[0])}
                   className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
                 />
                 <i className="text-gray-500">

@@ -22,7 +22,6 @@ import {
   fetchInvestorProfile,
 } from "../../../redux/actions/profileActions";
 import { useDispatch } from "react-redux";
-import { useLocation } from "react-router-dom";
 import InfoModal from "../InfoModal";
 /* eslint no-unused-vars: 0 */
 
@@ -74,16 +73,16 @@ const ReadOnlyTextFieldComponent = ({
 
 const InvestorProfile = () => {
   const [open, setOpen] = useState(false);
-  const [profileImage, setProfileImage] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [bvn, setBvn] = useState("");
-  const [investmentExperience, setInvestmentExperience] = useState("");
+  const [investmentExperience, setInvestmentExperience] = useState(0);
   const [expectation, setExpectation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [editField, setEditField] = useState("");
-  const [meansOfId, setMeansOfId] = useState(null);
+  const [identificationMeans, setIdentificationMeans] = useState(null);
   const [meansOfIdName, setMeansOfIdName] = useState("");
   const [isFileUploadEditable, setIsFileUploadEditable] = useState(false);
   const [fileUploadError, setFileUploadError] = useState("");
@@ -98,22 +97,19 @@ const InvestorProfile = () => {
   const [initialMemartFile, setInitialMemartFile] = useState("");
 
   useEffect(() => {
-    setInitialDirectorFile(meansOfId);
-    setInitialCacFile(meansOfId);
-    setInitialMemartFile(meansOfId);
-  }, [meansOfId]);
+    setInitialDirectorFile(identificationMeans);
+    setInitialCacFile(identificationMeans);
+    setInitialMemartFile(identificationMeans);
+  }, [identificationMeans]);
 
   const dispatch = useDispatch();
 
-  const location = useLocation();
-  const UniqueId = location.state?.uniqueId;
-  console.log(UniqueId);
-  // const token = location.state.token;
-  // console.log(token);
+  const UniqueId = localStorage.getItem('uniqueId')
+  
 
   const inputRefs = {
     fullName: useRef(null),
-    phoneNumber: useRef(null),
+    // phoneNumber: useRef(null),
     email: useRef(null),
     bvn: useRef(null),
     investmentExperience: useRef(null),
@@ -155,14 +151,14 @@ const InvestorProfile = () => {
   }, [dispatch, UniqueId]);
 
   const updateComponentState = (userProfile) => {
-    setFullName(userProfile.data.fullName);
+    setFullName(userProfile.data.username);
     setPhoneNumber(userProfile.data.phoneNumber);
     setEmail(userProfile.data.email);
     setBvn(userProfile.data.bvn);
-    setInvestmentExperience(userProfile.data.investmentExperience);
+    setInvestmentExperience (parseInt(userProfile.data.investmentExperience, 10) || 0);
     setExpectation(userProfile.data.expectation);
-    setMeansOfId(userProfile.data.meansOfId);
-    setProfileImage(userProfile.data.profileImage);
+    setIdentificationMeans(userProfile.data.identificationMeans);
+    setProfilePicture(userProfile.data.profilePicture);
   };
 
   const handleImageUpload = async (e) => {
@@ -171,7 +167,7 @@ const InvestorProfile = () => {
       setIsLoading(true);
       try {
         const response = await CloudinaryUpload(file, "profile_images");
-        setProfileImage(response.secure_url);
+        setProfilePicture(response.secure_url);
         setIsLoading(false);
       } catch (error) {
         console.error("Error uploading profile image to Cloudinary", error);
@@ -183,7 +179,7 @@ const InvestorProfile = () => {
   };
 
   const handleRemoveImage = () => {
-    setProfileImage("");
+    setProfilePicture("");
   };
 
   const handleSave = () => {
@@ -221,13 +217,13 @@ const InvestorProfile = () => {
       const profileData = {
         uniqueId: UniqueId,
         fullName,
-        phoneNumber,
-        email,
+        // phoneNumber,
+        // email,
         bvn,
-        investmentExperience,
+        investmentExperience :  parseInt(investmentExperience, 10),
         expectation,
-        meansOfId,
-        profileImage,
+        identificationMeans,
+        profilePicture,
       };
 
       const response = await dispatch(createInvestorProfile(profileData));
@@ -274,7 +270,7 @@ const InvestorProfile = () => {
           <div className="relative mb-4">
             <div className="w-60 h-60 rounded-full border-4 border-primary overflow-hidden relative group">
               <img
-                src={profileImage || "/images/profileImg.png"}
+                src={profilePicture || "/images/profileImg.png"}
                 alt="Profile"
                 className={`w-full h-full object-cover ${
                   isLoading ? "opacity-50" : ""
@@ -327,7 +323,7 @@ const InvestorProfile = () => {
               </div>
             </div>
 
-            <div className="relative">
+             <div className="relative">
               <ReadOnlyTextFieldComponent
                 label="Phone Number"
                 value={phoneNumber}
@@ -336,7 +332,7 @@ const InvestorProfile = () => {
               />
             </div>
 
-            <div className="relative">
+             <div className="relative">
               <ReadOnlyTextFieldComponent
                 label="Email"
                 value={email}
@@ -357,9 +353,10 @@ const InvestorProfile = () => {
             <div className="relative">
               <ReadOnlyTextFieldComponent
                 label="Investment Experience"
-                value={investmentExperience}
+                value={Number(investmentExperience)}
                 onChange={(e) => setInvestmentExperience(e.target.value)}
                 onEdit={() => handleEdit("investmentExperience")}
+                type="number"
               />
             </div>
 
@@ -387,10 +384,10 @@ const InvestorProfile = () => {
                   >
                     Upload Means of Identification
                   </label>
-                  {meansOfId && typeof meansOfId === "string" ? (
+                  {identificationMeans && typeof identificationMeans === "string" ? (
                     <div className="flex items-center border rounded-md border-gray-300 p-2">
                       <span className="block w-full text-sm text-gray-500">
-                        {meansOfId.substring(0, 20) + "..."}
+                        {identificationMeans.substring(0, 20) + "..."}
                       </span>
                       <i className="text-gray-500">
                         <AiOutlineCloudUpload />
@@ -403,7 +400,7 @@ const InvestorProfile = () => {
                         id="means-of-id-upload"
                         accept=".pdf, .jpg, .jpeg, .png,"
                         onChange={(e) =>
-                          handleFileUpload(e, setMeansOfId, "meansOfId")
+                          handleFileUpload(e, setIdentificationMeans, "identificationMeans")
                         }
                         className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
                       />
@@ -421,20 +418,20 @@ const InvestorProfile = () => {
         <InvestorProfileModal
           open={open}
           setOpen={setOpen}
-          fullName={fullName}
-          setFullName={setFullName}
-          phoneNumber={phoneNumber}
-          setPhoneNumber={setPhoneNumber}
-          email={email}
-          setEmail={setEmail}
+          // fullName={fullName}
+          // setFullName={setFullName}
+          // phoneNumber={phoneNumber}
+          // setPhoneNumber={setPhoneNumber}
+          // email={email}
+          // setEmail={setEmail}
           bvn={bvn}
           setBvn={setBvn}
           investmentExperience={investmentExperience}
           setInvestmentExperience={setInvestmentExperience}
           expectation={expectation}
           setExpectation={setExpectation}
-          meansOfId={meansOfId}
-          setMeansOfId={setMeansOfId}
+          identificationMeans={identificationMeans}
+          setIdentificationMeans={setIdentificationMeans}
           handleSave={handleSave}
         />
 

@@ -73,43 +73,48 @@ const CreatePage3 = () => {
     if (!loading) {
       setLoading(true);
       const updatedFormData = { ...formData, userUniqueId: uniqueId };
+      
+      setShowResponseModal(true);
+  
       dispatch(createProject(updatedFormData))
         .then((response) => {
           setResponse(response);
-          setLoading(false);
-          setShowResponseModal(true);
-          setShowConfirmModal(false);
+          setError(null);
+          setLoading(false); 
         })
         .catch((error) => {
           setError(error);
-          setLoading(false);
-          setShowResponseModal(true);
-          setShowConfirmModal(false);
+          setResponse(null);
+          setLoading(false); 
         });
     }
   };
+  
 
   const handleConfirmCancel = () => {
     setShowConfirmModal(false);
   };
 
-  // const handleResponseClose = () => {
-  //   setShowResponseModal(false);
-  //   setLoading(false);
-  // };
+  const handleResponseClose = () => {
+    setShowResponseModal(false);
+    setLoading(false);
+    setResponse(null); 
+    setError(null); 
+  };
 
   useEffect(() => {
-    if (
-      response &&
-      (response.statusCode === 200 || response.statusCode === 201)
-    ) {
-      setShowResponseModal(false);
+    if (response) {
       setLoading(false);
-      setTimeout(() => {
-        localStorage.clear();
-      }, 2000);
+      if (response.statusCode === 200 || response.statusCode === 201) {
+        setTimeout(() => {
+          localStorage.removeItem("formData");
+          navigate("/developer-dashboard"); 
+        }, 5000);
+      } else {
+        setShowResponseModal(true);
+      }
     }
-  }, [response]);
+  }, [response, navigate]);
 
   useEffect(() => {
     if (error) {
@@ -137,7 +142,7 @@ const CreatePage3 = () => {
           type="number"
           id="equipmentCost"
           name="equipmentCost"
-          value={Number(formData.equipmentCost)}
+          value={Number(formData.equipmentCost || 0)}
           onChange={handleChange}
           className="appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-xs md:text-sm text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
@@ -153,7 +158,7 @@ const CreatePage3 = () => {
           type="number"
           id="developmentCost"
           name="developmentCost"
-          value={Number(formData.developmentCost)}
+          value={Number(formData.developmentCost || 0)}
           onChange={handleChange}
           className="appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-xs md:text-sm text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
@@ -166,7 +171,7 @@ const CreatePage3 = () => {
           type="number"
           id="epcCost"
           name="epcCost"
-          value={Number(formData.epcCost)}
+          value={Number(formData.epcCost  || 0)}
           onChange={handleChange}
           className="appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-xs md:text-sm text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
@@ -186,7 +191,7 @@ const CreatePage3 = () => {
           type="number"
           id="expectedAverageMonthlyRevenue"
           name="expectedAverageMonthlyRevenue"
-          value={Number(formData.expectedAverageMonthlyRevenue)}
+          value={Number(formData.expectedAverageMonthlyRevenue || 0)}
           onChange={handleChange}
           className="appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-xs md:text-sm text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
@@ -202,7 +207,7 @@ const CreatePage3 = () => {
           type="number"
           id="connectionFeePerConnection"
           name="connectionFeePerConnection"
-          value={Number(formData.connectionFeePerConnection)}
+          value={Number(formData.connectionFeePerConnection || 0)}
           onChange={handleChange}
           className="appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-xs md:text-sm text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
@@ -218,7 +223,7 @@ const CreatePage3 = () => {
           type="number"
           id="averageMonthlyRevenuePerConnection"
           name="averageMonthlyRevenuePerConnection"
-          value={Number(formData.averageMonthlyRevenuePerConnection)}
+          value={Number(formData.averageMonthlyRevenuePerConnection || 0)}
           onChange={handleChange}
           className="appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-xs md:text-sm text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
@@ -289,7 +294,7 @@ const CreatePage3 = () => {
             type="number"
             id="equityPayoutStructure"
             name="equityPayoutStructure"
-            value={Number(formData.equityPayoutStructure)}
+            value={Number(formData.equityPayoutStructure || 0)}
             onChange={(e) => {
               setFormData({
                 ...formData,
@@ -313,7 +318,7 @@ const CreatePage3 = () => {
             type="number"
             id="debtPercentage"
             name="debtPercentage"
-            value={Number(formData.debtPercentage)}
+            value={Number(formData.debtPercentage || 0)}
             onChange={(e) => {
               setFormData({ ...formData, debtPercentage: +e.target.value });
             }}
@@ -343,7 +348,7 @@ const CreatePage3 = () => {
       />
       <ResponseModal
         isOpen={showResponseModal}
-        onClose={() => setShowResponseModal(false)}
+        onClose={handleResponseClose}
         response={response}
         error={error}
         loading={loading}

@@ -9,6 +9,7 @@ import {
   FaCaretRight,
 } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import TableSerachBar from "../TableSearchBar";
 
 const TableComponent = ({ title, columns, data, onRowClick }) => {
   return (
@@ -71,6 +72,7 @@ const ProjectTable = () => {
   const [filter, setFilter] = useState("All");
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
   const dispatch = useDispatch();
   const projectsState = useSelector((state) => state.projects);
 
@@ -97,7 +99,18 @@ const ProjectTable = () => {
     return true;
   });
 
-  const projectListData = filtered.map((project) => [
+  const searchedProjects = filtered.filter((project) => {
+    return (
+      project.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.projectUniqueId
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      new Date(project.startDate).toLocaleDateString().includes(searchQuery)
+    );
+  });
+
+  const projectListData = searchedProjects.map((project) => [
     project.projectUniqueId,
     project.projectName,
     project.location,
@@ -112,8 +125,8 @@ const ProjectTable = () => {
   const projectListColumns = [
     "Project Id ",
     "Project Name ",
-    "Project Location",
-    "Start Date",
+    " Project Location",
+    "Start Date ",
     "Status",
   ];
 
@@ -142,7 +155,7 @@ const ProjectTable = () => {
   return (
     <div className="bg-gray-100 p-4 h-screen">
       <div className="mb-4 flex flex-col md:flex-row items-center justify-between p-2">
-        <div className="flex items-center mb-4 md:mb-0">
+        <div className="flex items-center mb-4 md:mb-0 flex-wrap">
           <label className="mr-2 text-sm font-semibold text-primary">
             <FaFilter />
           </label>
@@ -156,7 +169,17 @@ const ProjectTable = () => {
             <option value="Pending">Pending</option>
           </select>
 
-          <div className="flex items-center ml-4">
+          <div className="ml-4 w-full md:w-auto">
+            <TableSerachBar
+              onSearch={(query) => {
+                setSearchQuery(query);
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between w-full md:w-auto">
+          <div className="flex items-center">
             <button
               onClick={handlePreviousPage}
               disabled={currentPage === 0}
@@ -166,37 +189,37 @@ const ProjectTable = () => {
             >
               <FaCaretLeft />
             </button>
-            {currentPage + 1} of {totalPages}
+            <span className="mx-2">{currentPage + 1} of {totalPages}</span>
             <button
               onClick={handleNextPage}
               disabled={currentPage >= totalPages - 1}
               className={`bg-primary text-white text-sm rounded-md px-4 py-2 hover:bg-secondary ${
                 currentPage >= totalPages - 1
-                  ? "opacity-50 cursor-not-allowed"
+                  ? " opacity-50 cursor-not-allowed"
                   : ""
               }`}
             >
               <FaCaretRight />
             </button>
           </div>
-        </div>
 
-        <button
-          onClick={handleBack}
-          className="flex items-center bg-primary text-white text-sm rounded-md px-4 py-2 hover:bg-secondary"
-        >
-          <FaArrowLeft className="mr-2" />
-          Back
-        </button>
+          <button
+            onClick={handleBack}
+            className="flex items-center bg-primary text-white text-sm rounded-md px-4 py-2 hover:bg-secondary ml-4"
+          >
+            <FaArrowLeft className="mr-2" />
+            Back
+          </button>
+        </div>
       </div>
 
       {loading ? (
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center m-4 justify-center bg-white rounded-xl h-[80%]">
           <FaSpinner className="animate-spin text-lg text-primary" />
         </div>
-      ) : filtered.length === 0 ? (
+      ) : searchedProjects.length === 0 ? (
         <div
-          className={`text-lg flex item-center justify-center font-semibold`}
+          className={`text-lg flex flex-col items-center m-4 justify-center bg-white rounded-xl h-[80%] font-semibold`}
         >
           No project found
         </div>

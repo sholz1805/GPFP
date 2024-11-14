@@ -1,27 +1,39 @@
 import React, { useEffect, useState } from "react";
 import { FaMoneyBillWave, FaPlus } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { GrProjects } from "react-icons/gr";
-import { RiFundsBoxFill } from "react-icons/ri";
 import { TbFileReport } from "react-icons/tb";
+import { MdPending } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjects } from "../../redux/actions/fetchAllProjectActions";
 import { useLogout } from "../authentication/authUtils/logoutUtil";
+import { fetchProjectsCount } from "../../redux/actions/projectsCountAction";
+import { FaSpinner } from "react-icons/fa6";
 
-const TableComponent = ({ title, columns, data, loading, error, onRowClick }) => {
+const TableComponent = ({
+  title,
+  columns,
+  data,
+  loading,
+  error,
+  onRowClick,
+}) => {
+
+  const navigate = useNavigate();
   return (
     <>
-      <div>
+      <div className="flex items-center justify-between">
         <p className="text-l font-semibold text-primary mb-2">{title}</p>
+        <p className="text-sm underline cursor-pointer text-primary" onClick={() => navigate("/all-projects")}>View all...</p>
       </div>
       <div
         className="bg-white border border-gray-300 rounded-lg p-2 overflow-y-auto scrollbar-hide"
         style={{ height: "65vh", width: "100%" }}
       >
         {loading ? (
-          <div className="flex justify-center items-center h-full">
-            <div className="loader">Loading...</div>
+          <div className="flex justify-center items-center h-screen">
+            <div className="loader"><FaSpinner/></div>
           </div>
         ) : error ? (
           <div className="flex justify-center items-center h-full">
@@ -120,50 +132,48 @@ const DeveloperDashboard = () => {
     "Status",
   ];
 
-  // console.log("location details", location)
-
   const navigate = useNavigate();
   const handleCreateProject = () => {
     navigate("/create-project");
   };
 
   const handleViewAllProject = () => {
-    navigate("/all-projects", {
-      state: {
-        uniqueId: UniqueId,
-      },
-    });
-  };
+    navigate("/all-projects") };
 
   const handleRowClick = (projectId) => {
-    navigate(`/project-details/${projectId}`); 
+    navigate(`/project-details/${projectId}`);
   };
 
   const dispatch = useDispatch();
   const projects = useSelector((state) => state.projects);
+  const projectsCount = useSelector((state) => state.projectsCount);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const location = useLocation();
-  const UniqueId = localStorage.getItem("uniqueId");
   const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        await dispatch(fetchProjects(UniqueId));
-      } catch (err) {
-        setError("Failed to load projects. Please try again.");
-      } finally {
-        setLoading(false);
+      const uniqueId = localStorage.getItem("uniqueId");
+      if (!uniqueId) {
+        navigate("/login");
       }
-    };
-
+        try {
+          setLoading(true);
+          setError(null);
+          await dispatch(fetchProjects(uniqueId));
+          await dispatch(fetchProjectsCount(uniqueId));
+        } catch (err) {
+          setError("Failed to load projects. Please try again.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    ;
+  
     fetchData();
-  }, [dispatch, UniqueId]);
+  }, [dispatch, navigate]);
 
   const projectListData = projects.projects.map((project) => [
     project.projectUniqueId,
@@ -201,20 +211,26 @@ const DeveloperDashboard = () => {
               alt="img"
               className="rounded-full w-40 h-40"
               height="50"
-              src={location.state?.profilePic}
+              src={
+                projectsCount.projectsCount?.data?.developerProfileData
+                  ?.profilePicture
+              }
               width="50"
             />
           </div>
           <div className="flex justify-center">
             <div>
               <h2 className="text-base font-semibold text-center">
-                {location.state?.companyName}
+                {
+                  projectsCount.projectsCount?.data?.developerProfileData
+                    ?.developerCompany
+                }
               </h2>
               {/* <p className="text-xs text-gray-600 text-center">
                 Lagos, Nigeria
               </p> */}
               <p className="text-xs text-primary text-center">
-                {location.state?.email}
+                {projectsCount.projectsCount?.data?.developerProfileData?.email}
               </p>
             </div>
           </div>
@@ -282,20 +298,20 @@ const DeveloperDashboard = () => {
             <Card
               icon={<GrProjects size={14} color="#467D9A" />}
               title="Projects"
-              figure={65}
-              details="Total Projects"
+              figure={projectsCount.projectsCount?.data?.approvedProjects}
+              details="Approved Projects"
             />
             <Card
               icon={<FaMoneyBillWave size={14} color="#467D9A" />}
               title="TotalInvestment"
-              figure={formatNumber(5000000500)}
+              figure={formatNumber(projectsCount.projectsCount?.data?.totalInvestmentRequired || 0)}
               details="Total Investment Requested"
             />
             <Card
-              icon={<RiFundsBoxFill size={14} color="#467D9A" />}
-              title="TotalRaised"
-              figure={formatNumber(3000000070)}
-              details="Total Investement Raised"
+              icon={<MdPending size={14} color="#467D9A" />}
+              title="Pending"
+              figure={projectsCount.projectsCount?.data?.unapprovedProjects}
+              details="Pending Projects"
             />
           </div>
           <TableComponent

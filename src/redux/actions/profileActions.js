@@ -118,7 +118,6 @@ export const fetchProfileFailure = (error) => ({
   payload: error,
 });
 
-// fetch developer profile
 export const fetchDeveloperProfile = (uniqueId) => {
   return async (dispatch) => {
     dispatch(fetchProfileRequest());

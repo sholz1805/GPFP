@@ -18,6 +18,9 @@ import DashboardRoutes from "./DashboardRoutes";
 import MessageBody from "../pages/admin/dashboard/MessageBody";
 import ProjectTable from "../pages/developer/ProjectTable";
 import ProjectDetails from "../pages/developer/ProjectDetails";
+import DeveloperDetails from "../pages/admin/dashboard/DeveloperDetails";
+import InvestorDetails from "../pages/admin/dashboard/InvestorDetails";
+import InvestModal from "../pages/investor/InvestModal";
 
 const ROUTES = [
   {
@@ -93,7 +96,7 @@ const ROUTES = [
     element: <CreateProject3 />,
   },
   {
-    path: "/test",
+    path: "/messages/:messageId",
     key: "Test",
     exact: true,
     element: <MessageBody />,
@@ -135,10 +138,28 @@ const ROUTES = [
     element: <ProjectDetails />,
   },
   {
+    path: "/developer-profile/:userId",
+    key: "DeveloperProfile",
+    exact: true,
+    element: <DeveloperDetails />,
+  },
+  {
+    path: "/investor-profile/:userId",
+    key: "InvestorProfile",
+    exact: true,
+    element: <InvestorDetails />,
+  },
+  {
     path: "/admin-dashboard/*",
     key: "AdminDashboard",
     exact: true,
     element: <DashboardRoutes />,
+  },
+  {
+    path: "/test",
+    key: "Test",
+    exact: true,
+    element: <InvestModal />,
   },
 ];
 

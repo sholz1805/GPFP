@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaChartLine,
   // FaChartLine,
@@ -10,6 +10,9 @@ import { IoMdSettings } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { GrProjects } from "react-icons/gr";
 import { TbFileReport } from "react-icons/tb";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchInvestedProjects, fetchTransactionCount } from "../../redux/actions/investorActions";
+import { useLogout } from "../authentication/authUtils/logoutUtil";
 
 const TableComponent = ({ title, columns, data }) => {
   return (
@@ -96,6 +99,8 @@ const Card = ({ icon, figure, details }) => {
 };
 
 const InvestorDashboard = () => {
+  const [openModal, setOpenModal] = useState(false);
+
   const projectListColumns = [
     "Project Id",
     "Project Name",
@@ -124,6 +129,34 @@ const InvestorDashboard = () => {
 
   const handleViewReport = () => {};
 
+  const dispatch = useDispatch();
+  const UniqueId = localStorage.getItem("uniqueId")
+    const investedProjects = useSelector((state) => state.investedProjects.investedProjects);
+    const transactionCount = useSelector((state) => state.investedProjects.transactionCount);
+   
+
+    console.log(investedProjects)
+    // console.log(transactionCount?.data)
+
+    useEffect(() => {
+        dispatch(fetchInvestedProjects(UniqueId));
+        dispatch(fetchTransactionCount(UniqueId));
+    }, [dispatch, UniqueId]);
+
+    const handleOpeModal = () => {
+      setOpenModal(true);
+    };
+  
+    const handleCloseModal = () => {
+      setOpenModal(false);
+    };
+  
+    const logout = useLogout();
+    const handleLogout = () => {
+      logout();
+    };
+
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="flex flex-col justify-center p-4 md:flex-row">
@@ -140,13 +173,13 @@ const InvestorDashboard = () => {
           <div className="flex justify-center">
             <div>
               <h2 className="text-base font-semibold text-center">
-                Chief Ben
+                {transactionCount?.data?.investorDetails?.fullName}
               </h2>
-              <p className="text-xs text-gray-600 text-center">
+              {/* <p className="text-xs text-gray-600 text-center">
                 Abuja, Nigeria
-              </p>
+              </p> */}
               <p className="text-xs text-primary text-center">
-                chiefBen@gmail.com
+              {transactionCount?.data?.investorDetails?.email}
               </p>
             </div>
           </div>
@@ -177,10 +210,36 @@ const InvestorDashboard = () => {
             </div>
           </div>
           <div className="mt-auto">
-            <button className="text-primary w-full text-sm py-2 px-2 rounded-lg flex    items-center">
+            <button
+              className="text-primary w-full text-sm py-2 px-2 rounded-lg flex  items-center"
+              onClick={handleOpeModal}
+            >
               <IoMdSettings className="mr-2" />
               Logout
             </button>
+            {openModal && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                <div className="bg-white rounded-lg shadow-lg  p-6 max-w-sm w-full">
+                  <p className="text-gray-500 mt-2 text-center leading-tight ">
+                    Are you sure you want to logout?
+                  </p>
+                  <div className="flex items-center justify-center gap-5">
+                    <button
+                      onClick={handleLogout}
+                      className="bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark mt-4"
+                    >
+                      Yes, Logout
+                    </button>
+                    <button
+                      onClick={handleCloseModal}
+                      className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-primary-dark mt-4"
+                    >
+                      No, go back
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <div className="w-full md:w-3/4 md:mx-2">

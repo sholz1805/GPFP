@@ -19,9 +19,9 @@ const ResponseModal = ({ isOpen, onClose, response, error, loading }) => {
         </button>
 
         {loading ? (
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center p-4">
             <FaSpinner size={24} className="animate-spin" />
-            <h2 className="text-lg font-semibold mb-4">Loading...</h2>
+            <h2 className="text-sm font-semibold mb-4">Loading...</h2>
           </div>
         ) : response ? (
           <div className="flex flex-col items-center">

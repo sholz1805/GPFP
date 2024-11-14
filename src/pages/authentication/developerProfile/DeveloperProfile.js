@@ -22,7 +22,6 @@ import {
   fetchDeveloperProfile,
 } from "../../../redux/actions/profileActions";
 import { useDispatch } from "react-redux";
-import { useLocation } from "react-router-dom";
 import InfoModal from "../InfoModal";
 /* eslint no-unused-vars: 0 */
 
@@ -109,11 +108,8 @@ const DeveloperProfile = () => {
 
   const dispatch = useDispatch();
 
-  const location = useLocation();
-  const UniqueId = location.state.uniqueId;
-  console.log(UniqueId);
-  // const token = location.state.token;
-  // console.log(token);
+  const UniqueId = localStorage.getItem("uniqueId");
+
 
   const inputRefs = {
     representativeName: useRef(null),

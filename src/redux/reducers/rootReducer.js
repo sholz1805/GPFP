@@ -6,6 +6,10 @@ import { projectReducer } from "./projectReducer";
 import { allProjectReducer } from "./fetchAllProjectReducer";
 import userReducer from "./userReducer";
 import singleProjectReducer from "./fetchSingleProjectReducer";
+import projectsCountReducer from "./projectsCountReducer";
+import investorReducers from "./investorReducers"
+import adminReducers from "./adminReducers"
+import availableProjects from "./availableProjectsReducer"
 
 const rootReducer = combineReducers({
   signup: signUpReducer,
@@ -15,6 +19,10 @@ const rootReducer = combineReducers({
   projects: allProjectReducer,
   user: userReducer,
   singleProject : singleProjectReducer,
+  projectsCount: projectsCountReducer,
+  investedProjects : investorReducers,
+  admin : adminReducers,
+  availableProjects : availableProjects,
   
 });
 

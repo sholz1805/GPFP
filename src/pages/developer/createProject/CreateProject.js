@@ -88,13 +88,22 @@ const CreateProject = () => {
 
   const navigate = useNavigate();
   const handleNextPage = () => {
-    // console.log(formData);
     navigate("/create-project-page2");
   };
   return (
+<>
+    <div className="flex justify-between items-center px-12 pt-4" >
+      <img src="images/gpfpLogo.svg" alt="Logo" className="h-8 mt-4" />
+      <button 
+        onClick={() => navigate("/developer-dashboard")} 
+        className="bg-primary text-white text-sm px-4 py-2 rounded hover:bg-secondary transition ease-in-out duration-300"
+      >
+        Back
+      </button>
+      </div>
+
     <div className="max-w-2xl px-10 sm:mx-4 sm:pt-6">
-      <img src="images/gpfpLogo.svg" alt="Logo" className="h-8 mt-6" />
-      <h2 className="text-xl font-semibold mb-4 my-8 text-[#515151]">
+            <h2 className="text-xl font-semibold mb-4 my-2 text-[#515151]">
         1. Project Details
       </h2>
       <div className="mb-4">
@@ -491,6 +500,7 @@ const CreateProject = () => {
         Next Page
       </button>
     </div>
+    </>
   );
 };
 

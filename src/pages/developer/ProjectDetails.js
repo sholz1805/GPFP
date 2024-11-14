@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchSingleProject } from '../../redux/actions/fetchSingleProjectActions';
+import { FaArrowLeft } from 'react-icons/fa';
+import { FaSpinner } from "react-icons/fa6";
 
 const ProjectDetails = () => {
   const dispatch = useDispatch();
@@ -15,7 +17,9 @@ const ProjectDetails = () => {
   }, [dispatch, projectId]);
   
   if (loading) {
-    return <div className="text-center text-gray-700">Loading...</div>;
+    return <div className=" flex justify-center items-center h-screen text-gray-700">
+      <FaSpinner/>
+    </div>;
   }
   
   if (error) {
@@ -31,12 +35,13 @@ const ProjectDetails = () => {
      <div className='flex justify-between items-center'>
 
       <h1 className="text-4xl font-bold mb-3 text-gray-800">{singleProject.projectName}</h1>
-      <button 
-        onClick={() => navigate(-1)} 
-        className="bg-primary text-white text-sm px-4 py-2 rounded hover:bg-secondary transition ease-in-out duration-300 mb-4"
-      >
-        Back
-      </button>
+      <button
+          onClick={() => navigate(-1)}
+          className="flex items-center bg-primary text-white text-sm rounded-md px-4 py-2 hover:bg-secondary"
+        >
+          < FaArrowLeft className="mr-2" />
+          Back
+        </button>
       </div>
       <p className="text-gray-700 mb-6">{singleProject.projectDescription}</p>
       <div className="bg-green-50 p-4 rounded mb-4">

@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DisplayCard from "./DisplayCard";
-import { FaUsers } from "react-icons/fa";
 import { MdBusinessCenter } from "react-icons/md";
 import { FaProjectDiagram } from "react-icons/fa";
+import { FaUserCog } from "react-icons/fa";
 import ProjectCard from "./ProjectCard";
 import MessageCard from "./MessageCard";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchAllMessages,
+  fetchAllProjects,
+  fetchCounts,
+} from "../../../redux/actions/adminActions";
 
 const DashboardHome = () => {
   const [activeTab, setActiveTab] = useState("All Projects");
@@ -145,23 +151,37 @@ const DashboardHome = () => {
     );
   };
 
+  const dispatch = useDispatch();
+  const adminCount = useSelector((state) => state.admin.counts);
+  // const allProjects = useSelector((state) => state.admin.allProjects);
+  const allMessages = useSelector((state) => state.admin.allMessages);
+
+  useEffect(() => {
+    dispatch(fetchCounts());
+    dispatch(fetchAllProjects());
+    dispatch(fetchAllMessages());
+  }, [dispatch]);
+
+  console.log(adminCount);
+  console.log(allMessages?.data);
+
   return (
     <main className="bg-gray-100 min-h-screen p-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <DisplayCard
-          title="Total Users"
-          figure={120}
-          icon={<FaUsers size={14} color="#467D9A" />}
+          title="Projects"
+          figure={adminCount?.data?.projectCount}
+          icon={<FaProjectDiagram size={14} color="#467D9A" />}
         />
         <DisplayCard
           title="Investors"
-          figure={72}
+          figure={adminCount?.data?.investorCount}
           icon={<MdBusinessCenter size={14} color="#467D9A" />}
         />
         <DisplayCard
           title="Developers"
-          figure={48}
-          icon={<FaProjectDiagram size={14} color="#467D9A" />}
+          figure={adminCount?.data?.developerCount}
+          icon={<FaUserCog size={14} color="#467D9A" />}
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
