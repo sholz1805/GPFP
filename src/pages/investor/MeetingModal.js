@@ -1,12 +1,13 @@
 import React, { useState } from "react";
+import { IoMdCloseCircle } from "react-icons/io";
 
-const ScheduleMeetingModal = () => {
+const MeetingModal = ({ onClose }) => {
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState("10:00am");
 
   const today = new Date();
   const maxDate = new Date(today);
-  maxDate.setDate(today.getDate() + 14); 
+  maxDate.setDate(today.getDate() + 14);
 
   const handleDateChange = (event) => {
     const selectedDate = new Date(event.target.value);
@@ -19,8 +20,13 @@ const ScheduleMeetingModal = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="bg-white p-8 rounded-lg w-96 m-2 md:m-3">
+        <div className="bg-white p-8 rounded-lg w-96 m-2 md:m-3 relative">
+          <button
+            className="absolute top-2 right-2 p-2 text-gray-400 hover:text-gray-900 transition duration-300"
+            onClick={onClose}
+          >
+            <IoMdCloseCircle />
+          </button>
           <form>
             <div className="mb-4">
               <label
@@ -35,7 +41,7 @@ const ScheduleMeetingModal = () => {
                 className="appearance-none border text-sm rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-green-200"
               />
             </div>
-            
+
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-semibold mb-2"
@@ -46,8 +52,8 @@ const ScheduleMeetingModal = () => {
               <div className="flex space-x-2">
                 <input
                   type="date"
-                  min={today.toISOString().split("T")[0]} 
-                  max={maxDate.toISOString().split("T")[0]} 
+                  min={today.toISOString().split("T")[0]}
+                  max={maxDate.toISOString().split("T")[0]}
                   onChange={handleDateChange}
                   className="appearance-none border text-sm rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-green-200"
                 />
@@ -90,8 +96,7 @@ const ScheduleMeetingModal = () => {
           </form>
         </div>
       </div>
-    </div>
   );
 };
 
-export default ScheduleMeetingModal;
+export default MeetingModal;

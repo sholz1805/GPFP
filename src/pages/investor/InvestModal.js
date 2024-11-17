@@ -1,10 +1,17 @@
 import React from "react";
+import { IoMdCloseCircle } from "react-icons/io";
 
-const InvestModal = () => {
+const InvestModal = ({ onClose }) => {
   return (
     <div>
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="bg-white p-8 rounded-lg w-96 m-2 md:m-3">
+      
+        <div className="bg-white p-8 rounded-lg w-96 m-2 md:m-3 relative">
+        <button
+        className="absolute top-2 right-2 p-2 text-gray-400 hover:text-gray-900 transition duration-300"
+        onClick={onClose}
+      >
+        <IoMdCloseCircle />
+      </button>
           <form>
             <div className="mb-4">
               <label
@@ -58,7 +65,6 @@ const InvestModal = () => {
           </form>
         </div>
       </div>
-    </div>
   );
 };
 

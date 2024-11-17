@@ -28,7 +28,7 @@ export const fetchTransactionCount = (uniqueId) => {
     return async (dispatch) => {
         dispatch({ type: FETCH_TRANSACTION_COUNT_REQUEST });
         try {
-            const response = await axios.get(`https://greenpower-stage-71fa5ec0b66d.herokuapp.com/api/v1/transaction/get/count`, {
+            const response = await axios.get(`https://greenpower-stage-71fa5ec0b66d.herokuapp.com/api/v1/transaction/get/count/investor`, {
                 params: { uniqueId }
             });
             dispatch({ type: FETCH_TRANSACTION_COUNT_SUCCESS, payload: response.data });

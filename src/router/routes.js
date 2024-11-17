@@ -21,6 +21,7 @@ import ProjectDetails from "../pages/developer/ProjectDetails";
 import DeveloperDetails from "../pages/admin/dashboard/DeveloperDetails";
 import InvestorDetails from "../pages/admin/dashboard/InvestorDetails";
 import InvestModal from "../pages/investor/InvestModal";
+import ProjectDetailsAdmin from "../pages/admin/ProjectDetailsAdmin";
 
 const ROUTES = [
   {
@@ -136,6 +137,12 @@ const ROUTES = [
     key: "ProjectDetails",
     exact: true,
     element: <ProjectDetails />,
+  },
+  {
+    path: "/projectdetails/:projectId",
+    key: "ProjectDetails",
+    exact: true,
+    element: <ProjectDetailsAdmin />,
   },
   {
     path: "/developer-profile/:userId",

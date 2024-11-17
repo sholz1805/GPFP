@@ -136,7 +136,7 @@ const InvestorDashboard = () => {
    
 
     console.log(investedProjects)
-    // console.log(transactionCount?.data)
+    console.log(transactionCount?.data)
 
     useEffect(() => {
         dispatch(fetchInvestedProjects(UniqueId));

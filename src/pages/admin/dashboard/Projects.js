@@ -99,7 +99,7 @@ const Projects = () => {
   ];
 
   const handleRowClick = (projectId) => {
-    navigate(`/project-details/${projectId}`);
+    navigate(`/projectdetails/${projectId}`);
   };
 
   const handleNextPage = () => {
