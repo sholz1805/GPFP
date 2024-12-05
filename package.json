@@ -17,6 +17,8 @@
     "cloudinary": "^2.4.0",
     "date-fns": "^4.1.0",
     "file-selector": "^0.6.0",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "naija-state-local-government": "^1.1.2",
     "nigeria-states-lgas": "^0.0.2",
     "postcss": "^8.4.44",

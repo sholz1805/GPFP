@@ -2,6 +2,7 @@ import {
     SIGNIN_REQUEST,
     SIGNIN_SUCCESS,
     SIGNIN_FAILURE,
+    LOGOUT,
   } from '../actions/signInActions'; 
   
   const initialState = {
@@ -18,6 +19,8 @@ import {
         return { loading: false, userData: action.payload, error: null };
       case SIGNIN_FAILURE:
         return { loading: false, userData: null, error: action.payload };
+      case LOGOUT:
+          return {...state, userData: null};
       default:
         return state;
     }

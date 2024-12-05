@@ -8,6 +8,7 @@ import { FiUploadCloud } from "react-icons/fi";
 import { LuLogOut } from "react-icons/lu";
 import { useState } from "react";
 import { useLogout } from "../authentication/authUtils/logoutUtil";
+import { MdDriveFolderUpload } from "react-icons/md";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -114,17 +115,17 @@ const Sidebar = () => {
                 <span>Developers</span>
               </Link>
             </li>
-            {/* <li>
+            <li>
               <Link
-                to="upload"
+                to="transaction"
                 className={`flex items-center space-x-2 hover:bg-[#467D9A] hover:text-white p-2 rounded-md ${
-                  location.pathname === "/admin-dashboard/upload" ? "bg-[#467D9A] text-white" : ""
+                  location.pathname === "/admin-dashboard/transaction" ? "bg-[#467D9A] text-white" : ""
                 }`}
               >
                 <MdDriveFolderUpload size={20} />
-                <span>Upload Project</span>
+                <span>Transactions</span>
               </Link>
-            </li> */}
+            </li>
             <li>
               <Link
                 to="report"

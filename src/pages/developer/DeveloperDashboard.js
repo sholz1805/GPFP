@@ -137,6 +137,10 @@ const DeveloperDashboard = () => {
     navigate("/create-project");
   };
 
+  const handleViewReport = () => {
+    navigate(`/project-report`);
+  }
+
   const handleViewAllProject = () => {
     navigate("/all-projects") };
 
@@ -180,13 +184,13 @@ const DeveloperDashboard = () => {
     project.projectName,
     project.location,
     new Date(project.startDate).toLocaleDateString(),
-    project.approved === true ? (
+    project.approved && project.reviewed && project.uploadUrl ? (
       <span className="text-green-500">Approved</span>
-    ) : project.approved === false && project.uploadUrl === null ? (
+    ) : !project.approved && !project.reviewed && project.uploadUrl === null ? (
       <span className="text-yellow-500">Pending</span>
-    ) : (
+    ) : !project.approved && project.reviewed && project.uploadUrl === null ? (
       <span className="text-red-500">Not Approved</span>
-    ),
+    ) : null, 
   ]);
 
   const handleOpeModal = () => {
@@ -203,7 +207,7 @@ const DeveloperDashboard = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen ">
+    <div className="bg-gray-100 min-h-screen">
       <div className="flex flex-col justify-center p-4 md:flex-row">
         <div className="w-full md:w-1/4 bg-white border border-gray-300 rounded-lg p-4 md:mx-2">
           <div className="mb-4 flex justify-center">
@@ -254,7 +258,9 @@ const DeveloperDashboard = () => {
               </button>
             </div>
             <div className="mb-2">
-              <button className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex items-center  hover:bg-secondary">
+              <button 
+              onClick={handleViewReport}
+              className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex items-center  hover:bg-secondary">
                 <TbFileReport className="mr-2" />
                 View Report
               </button>

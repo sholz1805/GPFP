@@ -20,13 +20,13 @@ const initialState = {
     error: '',
     meetingLoading: false,
     meetingError: '',
-    meetingResponse: null, // To store meeting response data
+    meetingResponse: null, 
     informationLoading: false,
     informationError: '',
-    informationResponse: null, // To store information response data
+    informationResponse: null, 
     investmentLoading: false,
     investmentError: '',
-    investmentResponse: null, // To store investment response data
+    investmentResponse: null, 
 };
 
 const availableProjectReducer = (state = initialState, action) => {
@@ -35,7 +35,7 @@ const availableProjectReducer = (state = initialState, action) => {
             return {
                 ...state,
                 loading: true,
-                error: '' // Reset error on new request
+                error: '' 
             };
         case FETCH_AVAILABLE_PROJECTS_SUCCESS:
             return {
@@ -58,13 +58,13 @@ const availableProjectReducer = (state = initialState, action) => {
                 ...state,
                 meetingLoading: true,
                 meetingError: '',
-                meetingResponse: null // Reset response on new request
+                meetingResponse: null 
             };
         case REQUEST_MEETING_SUCCESS:
             return {
                 ...state,
                 meetingLoading: false,
-                meetingResponse: action.payload.data, // Store the relevant response data
+                meetingResponse: action.payload.data, 
                 meetingError: ''
             };
         case REQUEST_MEETING_FAILURE:
@@ -78,13 +78,13 @@ const availableProjectReducer = (state = initialState, action) => {
                 ...state,
                 informationLoading: true,
                 informationError: '',
-                informationResponse: null // Reset response on new request
+                informationResponse: null 
             };
         case REQUEST_INFORMATION_SUCCESS:
             return {
                 ...state,
                 informationLoading: false,
-                informationResponse: action.payload.data, // Store the relevant response data
+                informationResponse: action.payload.data, 
                 informationError: ''
             };
         case REQUEST_INFORMATION_FAILURE:

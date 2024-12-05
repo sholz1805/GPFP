@@ -22,6 +22,8 @@ import DeveloperDetails from "../pages/admin/dashboard/DeveloperDetails";
 import InvestorDetails from "../pages/admin/dashboard/InvestorDetails";
 import InvestModal from "../pages/investor/InvestModal";
 import ProjectDetailsAdmin from "../pages/admin/ProjectDetailsAdmin";
+import Portfolio from "../pages/investor/Portfolio";
+import ProjectReport from "../pages/ProjectReport";
 
 const ROUTES = [
   {
@@ -115,14 +117,26 @@ const ROUTES = [
     element: <ProjectList />,
   },
   {
+    path: "/my-portfolio",
+    key: "Portfolio",
+    exact: true,
+    element: <Portfolio />,
+  },
+  {
     path: "/investor-dashboard",
     key: "InvestorDashboard",
     exact: true,
     element: <InvestorDashboard />,
   },
   {
+    path: "/project-report",
+    key: "ProjectReport",
+    exact: true,
+    element: <ProjectReport />,
+  },
+  {
     path: "/developer-dashboard",
-    key: "InvestorDashboard",
+    key: "DeveloperDashboard",
     exact: true,
     element: <DeveloperDashboard />,
   },

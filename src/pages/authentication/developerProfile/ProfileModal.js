@@ -1,7 +1,5 @@
 import React from "react";
-import {
-  AiOutlineCloudUpload,
-} from "react-icons/ai";
+import { AiOutlineCloudUpload } from "react-icons/ai";
 import {
   Modal,
   TextField,
@@ -143,9 +141,11 @@ const ProfileModal = ({
           onChange={(e) => setBriefAboutCompany(e.target.value)}
           margin="normal"
         />
-        
+
         <FormGroup>
-          <label className="block text-sm font-medium text-gray-700">Focus Area</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Focus Area
+          </label>
           <div className="flex flex-wrap gap-4">
             <FormControlLabel
               control={
@@ -217,9 +217,10 @@ const ProfileModal = ({
                 <input
                   type="file"
                   id="director-upload"
-                   accept=".pdf, .jpg, .jpeg, .png,"
+                  accept=".pdf, .jpg, .jpeg, .png,"
                   onChange={(e) => handleFileUpload(e, setDirectorFile)}
-                  className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
+                  className="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0
+                      file:text-sm file:font-semibold file:bg-green-50 cursor-pointer file:text-primary hover:file:bg-secondary-100"
                 />
                 <i className="text-gray-500">
                   <AiOutlineCloudUpload />
@@ -238,12 +239,13 @@ const ProfileModal = ({
                 <input
                   type="file"
                   id="cac-cert-upload"
-                   accept=".pdf, .jpg, .jpeg, .png,"
+                  accept=".pdf, .jpg, .jpeg, .png,"
                   onChange={(e) => handleFileUpload(e, setCacFile)}
-                  className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
+                  className="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0
+                      file:text-sm file:font-semibold file:bg-green-50 cursor-pointer file:text-primary hover:file:bg-secondary-100"
                 />
                 <i className="text-gray-500">
-                  <AiOutlineCloudUpload/>
+                  <AiOutlineCloudUpload />
                 </i>
               </div>
             </div>
@@ -259,9 +261,10 @@ const ProfileModal = ({
                 <input
                   type="file"
                   id="memart-upload"
-                   accept=".pdf, .jpg, .jpeg, .png,"
+                  accept=".pdf, .jpg, .jpeg, .png,"
                   onChange={(e) => handleFileUpload(e, setMemartFile)}
-                  className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
+                  className="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0
+                      file:text-sm file:font-semibold file:bg-green-50 cursor-pointer file:text-primary hover:file:bg-secondary-100"
                 />
                 <i className="text-gray-500">
                   <AiOutlineCloudUpload />

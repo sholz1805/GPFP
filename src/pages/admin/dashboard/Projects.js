@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllProjects } from "../../../redux/actions/adminActions"; // Ensure this action accepts a page parameter
-import { FaFilter, FaArrowLeft, FaSpinner, FaCaretLeft, FaCaretRight } from "react-icons/fa6";
+import { fetchAllProjects } from "../../../redux/actions/adminActions";
+import {
+  FaFilter,
+  FaSpinner,
+  FaCaretLeft,
+  FaCaretRight,
+} from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import TableSerachBar from "../../TableSearchBar";
 
 const TableComponent = ({ title, columns, data, onRowClick }) => {
   return (
@@ -54,6 +60,7 @@ const TableComponent = ({ title, columns, data, onRowClick }) => {
 const Projects = () => {
   const [filter, setFilter] = useState("All");
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -62,24 +69,30 @@ const Projects = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await dispatch(fetchAllProjects(currentPage)); 
+      await dispatch(fetchAllProjects(currentPage));
       setLoading(false);
     };
 
     fetchData();
-  }, [dispatch, currentPage]); 
-
+  }, [dispatch, currentPage]);
 
   const filteredProjects = projectsState.projects || [];
-  const totalPages = projectsState.totalPages || 0; 
-
-  console.log(projectsState)
+  const totalPages = projectsState.totalPages || 0;
 
   const filtered = filteredProjects.filter((project) => {
-    if (filter === "All") return true;
-    if (filter === "Approved") return project.approved === true;
-    if (filter === "Pending") return project.approved === false;
-    return true;
+    const matchesFilter = 
+      filter === "All" ||
+      (filter === "Approved" && project.approved === true) ||
+      (filter === "Pending" && project.approved === false && project.uploadUrl === null && project.reviewed === false) || 
+      (filter === "Not Approved" && project.approved === false && project.reviewed === true && project.uploadUrl === null);
+      
+    const matchesSearch = 
+      project.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.projectUniqueId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      new Date(project.startDate).toLocaleDateString().includes(searchQuery);
+  
+    return matchesFilter && matchesSearch;
   });
 
   const projectListData = filtered.map((project) => [
@@ -87,7 +100,13 @@ const Projects = () => {
     project.projectName,
     project.location,
     new Date(project.startDate).toLocaleDateString(),
-    project.approved ? "Approved" : "Pending",
+    project.approved && project.reviewed && project.uploadUrl
+      ? "Approved"
+      : !project.approved && !project.reviewed && project.uploadUrl === null
+      ? "Pending"
+      : !project.approved && project.reviewed && project.uploadUrl === null
+      ? "Not Approved"
+      : null,
   ]);
 
   const projectListColumns = [
@@ -117,7 +136,7 @@ const Projects = () => {
   return (
     <div className="bg-gray-100 p-4 h-screen">
       <div className="mb-4 flex flex-col md:flex-row items-center justify-between p-2">
-        <div className="flex items-center mb-4 md:mb-0">
+        <div className="flex items-center mb-4 md:mb-0 flex-wrap">
           <label className="mr-2 text-sm font-semibold text-primary">
             <FaFilter />
           </label>
@@ -125,16 +144,27 @@ const Projects = () => {
             value={filter}
             onChange={(e) => {
               setFilter(e.target.value);
-              setCurrentPage(0); // Reset to first page when filter changes
+              setCurrentPage(0);
             }}
             className="border border-gray-300 rounded-md text-sm p-2 outline-transparent"
           >
             <option value="All">All</option>
             <option value="Approved">Approved</option>
             <option value="Pending">Pending</option>
+            <option value="Not Approved">Not Approved</option>
           </select>
 
-          <div className="flex items-center ml-4">
+          <div className="ml-4 w-full md:w-auto">
+            <TableSerachBar
+              onSearch={(query) => {
+                setSearchQuery(query);
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between w-full md:w-auto">
+          <div className="flex items-center">
             <button
               onClick={handlePreviousPage}
               disabled={currentPage === 0}
@@ -144,7 +174,9 @@ const Projects = () => {
             >
               <FaCaretLeft />
             </button>
-            {currentPage + 1} of {totalPages}
+            <span className="mx-2">
+              {currentPage + 1} of {totalPages}
+            </span>
             <button
               onClick={handleNextPage}
               disabled={currentPage >= totalPages - 1}
@@ -158,14 +190,6 @@ const Projects = () => {
             </button>
           </div>
         </div>
-
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center bg-primary text-white text-sm rounded-md px-4 py-2 hover:bg-secondary"
-        >
-          <FaArrowLeft className="mr-2" />
-          Back
-        </button>
       </div>
 
       {loading ? (

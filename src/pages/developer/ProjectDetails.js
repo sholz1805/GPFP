@@ -37,11 +37,18 @@ const ProjectDetails = () => {
     return <div className="text-center text-gray-700">No project found</div>;
   }
 
-  // const fileExtension = singleProject.uploadUrl
-  //   ? singleProject.uploadUrl.split(".").pop().toLowerCase()
-  //   : "";
   const uploadUrl = singleProject.uploadUrl || '';
   const fileExtension = uploadUrl.split('.').pop().toLowerCase();
+
+
+  let status;
+  if (singleProject.approved) {
+    status = "Approved"; 
+  } else if (!singleProject.approved && !singleProject.reviewed) {
+    status = "Awaiting Approval"; 
+  } else if (!singleProject.approved && singleProject.reviewed) {
+    status = "Not Approved"; 
+  }
 
   return (
     <div className="h-screen p-9 bg-white">
@@ -58,21 +65,7 @@ const ProjectDetails = () => {
         </button>
       </div>
       <p className="text-gray-700 mb-6">{singleProject.projectDescription}</p>
-      <div className="bg-green-50 p-4 rounded mb-4">
-        <p className="text-gray-600">
-          <span className="font-semibold text-primary">Location:</span>{" "}
-          {singleProject.location}
-        </p>
-        <p className="text-gray-600">
-          <span className="font-semibold text-primary">Start Date:</span>{" "}
-          {new Date(singleProject.startDate).toLocaleDateString()}
-        </p>
-        <p className="text-gray-600">
-          <span className="font-semibold text-primary">Approved:</span>{" "}
-          {singleProject.approved ? "Yes" : "No"}
-        </p>
-      </div>
-
+  
       {singleProject.uploadUrl ? (
         <div className="bg-gray-50 p-4 rounded">
           <h2 className="text-xl font-semibold mb-2">Project Document</h2>
@@ -111,9 +104,7 @@ const ProjectDetails = () => {
             />
           ) : (
             <div>
-              <p className="text-gray-600 mb-2" 
-              > This file type is not supported for inline display. Please download it to view:
-              </p>
+              <p className="text-gray-600 mb-2"> This file type is not supported for inline display. Please download it to view:</p>
               <a
                 href={singleProject.uploadUrl}
                 target="_self"
@@ -127,9 +118,30 @@ const ProjectDetails = () => {
           {docError && <div className="text-red-500 mt-2">Error loading document: {docError.message}</div>}
         </div>
       ) : (
-        <div className="text-gray-600">
-          <span className="font-semibold text-primary">Status:</span> Awaiting
-          Approval
+        <div className="bg-green-50 p-4 rounded mb-4">
+          <p className="text-gray-600">
+            <span className="font-semibold text-primary">Location:</span>{" "}
+            {singleProject.location}
+          </p>
+          <p className="text-gray-600">
+            <span className="font-semibold text-primary">Start Date:</span>{" "}
+            {new Date(singleProject.startDate).toLocaleDateString()}
+          </p>
+          <p className="text-gray-600">
+            <span className="font-semibold text-primary">Project ID:</span>{" "}
+            {singleProject.projectUniqueId}
+          </p>
+          <p className="text-gray-600">
+            <span className="font-semibold text-primary">Status:</span>{" "}
+            {status}
+          </p>
+  
+          {singleProject.rejectionReason && (
+            <p className="text-red-600">
+              <span className="font-semibold text-primary">Rejection Reason:</span>{" "}
+              {singleProject.rejectionReason}
+            </p>
+          )}
         </div>
       )}
     </div>

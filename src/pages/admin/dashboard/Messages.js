@@ -6,6 +6,22 @@ import { useNavigate } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
 
 const Message = ({ message, onClick, isLast }) => {
+
+  const formatTitle = (title) => {
+    return title
+        .replace(/_/g, ' ')
+        .toLowerCase() 
+        .split(' ') 
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) 
+        .join(' '); 
+};
+
+  const formatDateString = (dateString) => {
+    const date = new Date(dateString);
+    const options = { year: "numeric", month: "short", day: "numeric" };
+    return date.toLocaleDateString("en-US", options).replace(",", "");
+  };
+
   return (
     <>
       <div
@@ -19,11 +35,12 @@ const Message = ({ message, onClick, isLast }) => {
           />
           <div>
             <h2 className="text-sm font-semibold">
-              {message.notificationType}
+              {formatTitle(message.notificationType)} from {message.userDto?.fullName}
             </h2>
-            <p className="text-gray-600 text-xs leading-tight">
+            <p className="text-xs italic text-primary">{formatDateString(message.createdTime)}</p>
+            {/* <p className="text-gray-600 text-xs leading-tight">
               {message.message || "No message content"}
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
@@ -55,6 +72,8 @@ export const Messages = () => {
     message.notificationType.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // console.log(allMessages)
+
   const handleMessageClick = (message) => {
     navigate(`/messages/${message.uniqueId || message.createdTime}`);
   };
@@ -65,11 +84,11 @@ export const Messages = () => {
         <div className="bg-white flex items-center justify-between gap-3 px-4 py-2 mb-2 rounded-md">
           <h1 className="text-l font-semibold text-[#467D9A]">Messages</h1>
           <div className="flex items-center justify-between ">
-            <IoSearchCircleSharp size={20} color="#467D9A" />
+            <IoSearchCircleSharp size={28} color="#467D9A" />
             <input
               type="text"
               placeholder="Search messages..."
-              className="w-full p-1 border border-gray-300 rounded outline-none text-sm"
+              className="w-full border p-2 border-gray-300 rounded outline-none text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />

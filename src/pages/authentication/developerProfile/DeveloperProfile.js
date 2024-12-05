@@ -5,6 +5,8 @@ import {
   AiOutlineLoading,
   AiOutlineCloudUpload,
 } from "react-icons/ai";
+import { MdDashboard } from "react-icons/md";
+
 import {
   TextField,
   Button,
@@ -23,6 +25,7 @@ import {
 } from "../../../redux/actions/profileActions";
 import { useDispatch } from "react-redux";
 import InfoModal from "../InfoModal";
+import { useNavigate } from "react-router-dom";
 /* eslint no-unused-vars: 0 */
 
 const ReadOnlyTextField = styled(TextField)(({ theme }) => ({
@@ -110,7 +113,6 @@ const DeveloperProfile = () => {
 
   const UniqueId = localStorage.getItem("uniqueId");
 
-
   const inputRefs = {
     representativeName: useRef(null),
     companyName: useRef(null),
@@ -182,10 +184,14 @@ const DeveloperProfile = () => {
       setIsLoading(true);
       try {
         const response = await CloudinaryUpload(file, "profile_images");
-        setProfileImage(response.secure_url);
-        setIsLoading(false);
+        if (response) {
+          setProfileImage(response);
+        } else {
+          console.error("No secure URL returned from Cloudinary");
+        }
       } catch (error) {
         console.error("Error uploading profile image to Cloudinary", error);
+      } finally {
         setIsLoading(false);
       }
     } else {
@@ -197,8 +203,12 @@ const DeveloperProfile = () => {
     setProfileImage("");
   };
 
-  const handleSave = () => {
-    handleCreateProfile();
+  const handleSave = async () => {
+    if (!profileImage) {
+      console.error("Profile image is not set. Please upload an image first.");
+      return;
+    }
+    await handleCreateProfile();
     setOpen(false);
   };
 
@@ -238,6 +248,8 @@ const DeveloperProfile = () => {
     setResponseMessage("Saving profile...");
 
     try {
+      console.log("Profile Image URL:", profileImage);
+
       const profileData = {
         uniqueId: UniqueId,
         companyAddress: address,
@@ -260,10 +272,11 @@ const DeveloperProfile = () => {
           memartFile === initialMemartFile ? initialMemartFile : memartFile,
       };
 
-      // if (!profileData.companyName || !profileData.address || !profileData.representativeName || !profileData.representativeEmail) {
-      //   throw new Error("Please fill in all required fields");
-      // }
+      console.log("Profile Data:", profileData);
+
       const response = await dispatch(createDeveloperProfile(profileData));
+
+      console.log("API Response:", response);
 
       if (response.error) {
         throw new Error(`Error creating profile: ${response.error}`);
@@ -284,6 +297,14 @@ const DeveloperProfile = () => {
     }
   };
 
+  const navigate = useNavigate();
+  const isProfileAvailable = Object.keys(profile).length > 0;
+  const handleToDashboard = () => {
+    navigate("/developer-dashboard")
+  }
+
+
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="bg-white p-4 rounded-md mb-4">
@@ -291,14 +312,27 @@ const DeveloperProfile = () => {
           <h1 className="text-sm text-primary font-semibold">
             Developer's Profile
           </h1>
+          <div className="flex justify-between items-center gap-5">
           <Button
             onClick={() => setOpen(true)}
             variant="contained"
             color="primary"
             startIcon={<AiOutlineEdit />}
+            style={{ textTransform: "none" }}
           >
             Edit Profile
           </Button>
+          <Button
+            onClick={handleToDashboard}
+            variant="contained"
+            color="primary"
+            startIcon={<MdDashboard />}
+            style={{ textTransform: "none" }}
+            disabled={!isProfileAvailable}
+          >
+            Dashboard
+          </Button>
+          </div>
         </div>
       </div>
 
@@ -342,6 +376,7 @@ const DeveloperProfile = () => {
           {isLoading && (
             <AiOutlineLoading className="text-lime-500 animate-spin mb-2" />
           )}
+
           <p className="text-center text-primary font-medium text-xl">
             {companyName || "Company's Name"}
           </p>
@@ -553,7 +588,8 @@ const DeveloperProfile = () => {
                         onChange={(e) =>
                           handleFileUpload(e, setDirectorFile, "directorFile")
                         }
-                        className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
+                        className="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0
+                        file:text-sm file:font-semibold file:bg-green-50 cursor-pointer file:text-primary hover:file:bg-secondary-100"
                       />
                       <i className="text-gray-500">
                         <AiOutlineCloudUpload />
@@ -569,7 +605,7 @@ const DeveloperProfile = () => {
                   >
                     CAC Cert
                   </label>
-                  <div className="flex items-center border rounded-md border-gray-300 p-2">
+                  <div className="flex items-center justify-center border rounded-md border-gray-300 p-2">
                     <input
                       type="file"
                       id="cac-cert-upload"
@@ -577,7 +613,8 @@ const DeveloperProfile = () => {
                       onChange={(e) =>
                         handleFileUpload(e, setCacFile, "cacFile")
                       }
-                      className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
+                      className="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0
+          file:text-sm file:font-semibold file:bg-green-50 cursor-pointer file:text-primary hover:file:bg-secondary-100"
                     />
                     <i className="text-gray-500">
                       <AiOutlineCloudUpload />
@@ -600,7 +637,8 @@ const DeveloperProfile = () => {
                       onChange={(e) =>
                         handleFileUpload(e, setMemartFile, "memartFile")
                       }
-                      className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
+                      className="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0
+                      file:text-sm file:font-semibold file:bg-green-50 cursor-pointer file:text-primary hover:file:bg-secondary-100"
                     />
                     <i className="text-gray-500">
                       <AiOutlineCloudUpload />

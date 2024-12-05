@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllDevelopers } from "../../../redux/actions/adminActions";
+import { fetchInvestedProjects } from "../../redux/actions/investorActions";
 import { FaSpinner, FaCaretLeft, FaCaretRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import TableSearchBar from "../../TableSearchBar";
+import TableSearchBar from "../TableSearchBar";
 
 const TableComponent = ({ title, columns, data, onRowClick }) => {
   return (
@@ -15,13 +15,13 @@ const TableComponent = ({ title, columns, data, onRowClick }) => {
         className="bg-white border border-gray-300 rounded-lg p-2 overflow-y-auto scrollbar-hide"
         style={{ height: "80vh", width: "100%" }}
       >
-        <table className="min-w-full bg-white ">
+        <table className="min-w-full bg-white">
           <thead>
             <tr>
               {columns.map((column, index) => (
                 <th
                   key={index}
-                  className="text-left text-xs font-semibold text-primary py-6 px-2 border-b border-gray-300 border-b-2 border-primary"
+                  className="text-left text-xs font-semibold text-primary py-6 px-2 border-b-2 border-primary"
                 >
                   {column}
                 </th>
@@ -52,47 +52,49 @@ const TableComponent = ({ title, columns, data, onRowClick }) => {
   );
 };
 
-const Developer = () => {
+const Portfolio = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const allDevelopers = useSelector((state) => state.admin.allDevelopers);
+  const investedProjects = useSelector((state) => state.investedProjects.investedProjects);
+  const uniqueId = localStorage.getItem("uniqueId");
+  console.log(investedProjects)
 
   useEffect(() => {
-    dispatch(fetchAllDevelopers());
-  }, [dispatch]);
+    if (uniqueId) {
+      dispatch(fetchInvestedProjects(uniqueId));
+    }
+  }, [dispatch, uniqueId]);
 
-  const developerListColumns = [
-    "Developer Id",
-    "Name",
-    "Email",
-    "Phone Number",
-  ];
+  const isLoading = investedProjects.loading;
+  const errorMessage = investedProjects.error;  
+  const allProjects = investedProjects?.data?.investmentList?.content || [];
+  console.log(allProjects)
 
-  const isLoading = allDevelopers.loading;
-  const errorMessage = allDevelopers.error;
-
-  const filteredDevelopers = (allDevelopers.data || []).filter((developer) => {
+  const filteredProjects = allProjects.filter((item) => {
+    if (!searchQuery.trim()) return true; 
     return (
-      developer.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      developer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      developer.phoneNumber.includes(searchQuery)
+      item.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.developerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.developerEmail.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
+  
 
-  const totalPages = Math.ceil(filteredDevelopers.length / 10);
-  const paginatedDevelopers = filteredDevelopers
+  const totalPages = Math.ceil(filteredProjects.length / 10);
+  const paginatedProjects = filteredProjects
     .slice(currentPage * 10, (currentPage + 1) * 10)
-    .map((developer) => [
-      developer.uniqueId,
-      developer.username,
-      developer.email,
-      developer.phoneNumber,
+    .map((item) => [
+      item?.projectUniqueId,
+      item?.projectName,
+      item?.developerName,
+      item?.developerEmail,
+      item?.investedAmount,
     ]);
 
-  const handleRowClick = (developerId) => {
-    navigate(`/developer-profile/${developerId}`);
+  const handleRowClick = (projectId) => {
+    navigate(`/project-details/${projectId}`);
   };
 
   const handleNextPage = () => {
@@ -107,21 +109,21 @@ const Developer = () => {
     }
   };
 
+  const handleBack = () => {
+    navigate(-1); 
+  };
+
   return (
     <main className="bg-gray-100 min-h-screen p-4">
       <div className="mb-4 flex flex-col md:flex-row items-center justify-between p-2">
-        <div className="flex items-center mb-4 md:mb-0 flex-wrap">
-          <div className="w-full md:w-auto">
-            <TableSearchBar
-              onSearch={(query) => {
-                setSearchQuery(query);
-              }}
-            />
-          </div>
+        <div className="flex items-center mb-4 md:mb-0">
+          <TableSearchBar onSearch={setSearchQuery} />
         </div>
 
-        <div className="flex items-center justify-between w-full md:w-auto">
-          <div className="flex items-center">
+        <div className="flex items-center justify-between md:w-auto">
+         
+          <div className="flex items-center gap-3">
+            <div>
             <button
               onClick={handlePreviousPage}
               disabled={currentPage === 0}
@@ -132,7 +134,7 @@ const Developer = () => {
               <FaCaretLeft />
             </button>
             <span className="mx-2">
-              {currentPage + 1} of {totalPages}
+              {currentPage + 1} of {totalPages || 1}
             </span>
             <button
               onClick={handleNextPage}
@@ -145,25 +147,42 @@ const Developer = () => {
             >
               <FaCaretRight />
             </button>
+            </div>
+           
+
+            <button
+            onClick={handleBack}
+            className="bg-primary text-white text-sm rounded-md px-4 py-2 hover:bg-secondary"
+          >
+            Back
+          </button>
           </div>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="flex flex-col items-center m-4 justify-center bg-white rounded-xl h-[80%]">
+        <div className="text-xl flex items-center justify-center bg-white rounded-xl h-screen font-semibold">
           <FaSpinner className="animate-spin text-lg text-primary" />
         </div>
-      ) : errorMessage || filteredDevelopers.length === 0 ? (
-        <div
-          className={`text-lg flex flex-col h-screen items-center m-4 justify-center bg-white rounded-xl h-[80%] font-semibold`}
-        >
-          {errorMessage || "No Developer(s) found."}
+      ) : errorMessage ? (
+        <div className="text-sm flex items-center justify-center bg-white rounded-xl h-screen font-semibold">
+          {errorMessage}
+        </div>
+      ) : filteredProjects.length === 0 ? (
+        <div className="text-sm flex items-center justify-center bg-white rounded-xl h-screen font-semibold">
+          No projects found.
         </div>
       ) : (
         <TableComponent
-          title="Developer(s) List"
-          columns={developerListColumns}
-          data={paginatedDevelopers}
+          title="Invested Projects"
+          columns={[
+            "Project ID",
+            "Project Name",
+            "Developer",
+            "Email",
+            "Invested Amount",
+          ]}
+          data={paginatedProjects}
           onRowClick={handleRowClick}
         />
       )}
@@ -171,4 +190,4 @@ const Developer = () => {
   );
 };
 
-export default Developer;
+export default Portfolio;

@@ -1,8 +1,8 @@
 const ProjectCard = ({ project }) => {
   return (
     <li className="flex justify-between text-sm items-center mb-2">
-      <span >{project.name}</span>
-      <span>{project.date}</span>
+      <span >{project.id}</span>
+      <span>{project.name  || "No name added"} </span>
       <span
         className={`px-2 py-1 text-sm ${
           project.status === "Approved"

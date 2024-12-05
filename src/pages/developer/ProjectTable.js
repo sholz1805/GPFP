@@ -115,11 +115,13 @@ const ProjectTable = () => {
     project.projectName,
     project.location,
     new Date(project.startDate).toLocaleDateString(),
-    project.approved
+    project.approved && project.reviewed && project.uploadUrl
       ? "Approved"
-      : project.uploadUrl === null
+      : !project.approved && !project.reviewed && project.uploadUrl === null
       ? "Pending"
-      : "Not Approved",
+      : !project.approved && project.reviewed && project.uploadUrl === null
+      ? "Not Approved"
+      : null,
   ]);
 
   const projectListColumns = [

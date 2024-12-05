@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   FaChartLine,
-  // FaChartLine,
   FaMoneyBillWave,
-  // FaPlus,
   FaProjectDiagram,
 } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
@@ -11,10 +9,13 @@ import { useNavigate } from "react-router-dom";
 import { GrProjects } from "react-icons/gr";
 import { TbFileReport } from "react-icons/tb";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchInvestedProjects, fetchTransactionCount } from "../../redux/actions/investorActions";
+import {
+  fetchInvestedProjects,
+  fetchTransactionCount,
+} from "../../redux/actions/investorActions";
 import { useLogout } from "../authentication/authUtils/logoutUtil";
 
-const TableComponent = ({ title, columns, data }) => {
+const TableComponent = ({ title, columns, data, onRowClick }) => {
   return (
     <>
       <div>
@@ -30,7 +31,7 @@ const TableComponent = ({ title, columns, data }) => {
               {columns.map((column, index) => (
                 <th
                   key={index}
-                  className="text-left text-xs font-semibold text-primary py-6 px-2 border-b border-gray-300 border-b-2 border-primary"
+                  className="text-left text-xs font-semibold text-primary py-6 px-2 border-b-2 border-primary"
                 >
                   {column}
                 </th>
@@ -39,15 +40,34 @@ const TableComponent = ({ title, columns, data }) => {
           </thead>
           <tbody>
             {data.map((row, index) => (
-              <tr key={index}>
-                {row.map((cell, index) => (
-                  <td
-                    key={index}
-                    className="text-left text-xs py-3 px-2 border-b border-gray-300"
-                  >
-                    {cell}
-                  </td>
-                ))}
+              <tr
+                key={index}
+                onClick={() => onRowClick(row[0])}
+                className="cursor-pointer hover:bg-gray-100"
+              >
+                {row.map((cell, index) => {
+                  if (index === 4) {
+                    const amount = parseFloat(cell);
+                    const formattedAmount = `N${amount.toLocaleString()}`;
+                    return (
+                      <td
+                        key={index}
+                        className="text-left text-xs py-3 px-2 border-b border-gray-300"
+                      >
+                        {formattedAmount}
+                      </td>
+                    );
+                  } else {
+                    return (
+                      <td
+                        key={index}
+                        className="text-left text-xs py-3 px-2 border-b border-gray-300"
+                      >
+                        {cell}
+                      </td>
+                    );
+                  }
+                })}
               </tr>
             ))}
           </tbody>
@@ -104,58 +124,85 @@ const InvestorDashboard = () => {
   const projectListColumns = [
     "Project Id",
     "Project Name",
-    "Location",
-    "Amount Invested",
     "Developer",
-  ];
-  const projectListData = [
-    ["GP1001","LightUp Lagos",  "Lagos", "200m", "WaveLenght"],
-    ["GP1002", "Abuja TradeFair", "Abuja", "100m", "GreenDream"],
-    ["GP1003", "GreenBenue", "Benue", "50m", "GreenTrade"],
-    ["GP1004","LightUp ABJ",  "Abuja", "150m", "Power Up"],
-    ["GP1005", "KogiNG", "Kogi", "250m", "Go Nigeria"],
-    ["GP1006", "LightUp Ibadan", "Ibadan", "20m", "WaveLenght"],
-    ["GP1007", "LightUp Osun",  "Osun", "50m", "WaveLenght"],
-    ["GP1008", "Ogun SolarPower",  "Ogun", "100m", "Power Up"],
-    ["GP1009", "Green Edo",  "Edo", "150m", "GreenDream"],
-    ["GP10010", "Borno Trafe Fair", "Borno", "100m", "GreenDream"],
-    ["GP10011", "Green Borno", "Jos", "50m", "GreenTrade"],
+    "Email",
+    "Amount Invested",
+    
   ];
 
   const navigate = useNavigate();
+  const handlePortfolio = () => {
+    navigate("/my-portfolio");
+  };
+
   const handleViewProject = () => {
     navigate("/project-list");
   };
 
-  const handleViewReport = () => {};
+  const handleRowClick = (projectId) => {
+    navigate(`/project-details/${projectId}`);
+  };
+
+  const handleViewReport = () => {
+    navigate(`/project-report`);
+  };
 
   const dispatch = useDispatch();
-  const UniqueId = localStorage.getItem("uniqueId")
-    const investedProjects = useSelector((state) => state.investedProjects.investedProjects);
-    const transactionCount = useSelector((state) => state.investedProjects.transactionCount);
-   
+  const UniqueId = localStorage.getItem("uniqueId");
+  const investedProjects = useSelector(
+    (state) => state.investedProjects.investedProjects
+  );
+  const transactionCount = useSelector(
+    (state) => state.investedProjects.transactionCount
+  );
 
-    console.log(investedProjects)
-    console.log(transactionCount?.data)
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!UniqueId) {
+        navigate("/login");
+        return; 
+      }
 
-    useEffect(() => {
-        dispatch(fetchInvestedProjects(UniqueId));
-        dispatch(fetchTransactionCount(UniqueId));
-    }, [dispatch, UniqueId]);
-
-    const handleOpeModal = () => {
-      setOpenModal(true);
+      try {
+        await dispatch(fetchInvestedProjects(UniqueId));
+        await dispatch(fetchTransactionCount(UniqueId));
+      } catch (err) {
+        console.error("Failed to load invested projects or transaction count:", err);
+      }
     };
+
+    fetchData();
+  }, [dispatch, navigate, UniqueId]);
+
+  // console.log(investedProjects);
+  // console.log(transactionCount);
+
   
-    const handleCloseModal = () => {
-      setOpenModal(false);
-    };
-  
-    const logout = useLogout();
-    const handleLogout = () => {
-      logout();
-    };
 
+  const handleOpeModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const logout = useLogout();
+  const handleLogout = () => {
+    logout();
+  };
+
+  const projectListData =
+    investedProjects?.data?.investmentList?.content.map((item) => [
+      item?.projectUniqueId,
+      item?.projectName,
+      item?.developerName,
+      item?.developerEmail,
+      item?.investedAmount,
+    ]) || [];
+
+  const hasInvestedProjects =
+    investedProjects?.data?.investmentList?.content?.length > 0;
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -166,7 +213,7 @@ const InvestorDashboard = () => {
               alt="img"
               className="rounded-full w-40 h-40"
               height="50"
-              src="https://cdn.prod.website-files.com/656da6fea306219773d04208/66bc6bb65045d2d90c4bd50a_image.avif"
+              src={transactionCount?.data?.investorDetails?.profilePicture}
               width="50"
             />
           </div>
@@ -175,17 +222,17 @@ const InvestorDashboard = () => {
               <h2 className="text-base font-semibold text-center">
                 {transactionCount?.data?.investorDetails?.fullName}
               </h2>
-              {/* <p className="text-xs text-gray-600 text-center">
-                Abuja, Nigeria
-              </p> */}
               <p className="text-xs text-primary text-center">
-              {transactionCount?.data?.investorDetails?.email}
+                {transactionCount?.data?.investorDetails?.email}
               </p>
             </div>
           </div>
           <div className="bg-gray-100 p-2 rounded-lg my-6">
             <div className="mb-2">
-              <button className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex items-center  hover:bg-secondary">
+              <button
+                onClick={handlePortfolio}
+                className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex items-center hover:bg-secondary"
+              >
                 <FaChartLine className="mr-2" />
                 My Portfolio
               </button>
@@ -193,7 +240,7 @@ const InvestorDashboard = () => {
             <div className="mb-2">
               <button
                 onClick={handleViewProject}
-                className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex  hover:bg-secondary items-center"
+                className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex hover:bg-secondary items-center"
               >
                 <GrProjects className="mr-2" />
                 View Projects
@@ -202,7 +249,7 @@ const InvestorDashboard = () => {
             <div className="mb-2">
               <button
                 onClick={handleViewReport}
-                className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex  hover:bg-secondary items-center"
+                className="bg-primary text-white w-full text-xs py-2 px-2 rounded-lg flex hover:bg-secondary items-center"
               >
                 <TbFileReport className="mr-2" />
                 View Report
@@ -211,7 +258,7 @@ const InvestorDashboard = () => {
           </div>
           <div className="mt-auto">
             <button
-              className="text-primary w-full text-sm py-2 px-2 rounded-lg flex  items-center"
+              className="text-primary w-full text-sm py-2 px-2 rounded-lg flex items-center"
               onClick={handleOpeModal}
             >
               <IoMdSettings className="mr-2" />
@@ -246,28 +293,40 @@ const InvestorDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4 h-auto">
             <Card
               icon={<GrProjects size={14} color="#467D9A" />}
-              title="Projects"
-              figure={20}
-              details="Total Projects"
+              title="EquityValue"
+              figure={formatNumber(transactionCount?.data?.equityValue)}
+              details="Equity Value"
             />
             <Card
               icon={<FaMoneyBillWave size={14} color="#467D9A" />}
-              title="Investment"
-              figure={formatNumber(5000000500)}
-              details="Total Investment"
+              title="InvestmentValue"
+              figure={
+                formatNumber(transactionCount?.data?.investmentValue) || 0
+              }
+              details="Investment Value"
             />
             <Card
               icon={<FaProjectDiagram size={14} color="#467D9A" />}
-              title="ActiveProject"
-              figure={12}
-              details="Active Projects"
+              title="ActiveInvestments"
+              figure={transactionCount?.data?.investmentCount}
+              details="Active Investments"
             />
           </div>
-          <TableComponent
-            title="Project List"
-            columns={projectListColumns}
-            data={projectListData}
-          />
+          {hasInvestedProjects ? (
+            <TableComponent
+              title="My Portfolio"
+              columns={projectListColumns}
+              data={projectListData}
+              onRowClick={handleRowClick}
+            />
+          ) : (
+            <div
+              className="bg-white border border-gray-300 rounded-lg p-2 overflow-y-auto scrollbar-hide flex justify-center items-center"
+              style={{ height: "65vh", width: "100%" }}
+            >
+              You don't have any investment yet.
+            </div>
+          )}
         </div>
       </div>
     </div>

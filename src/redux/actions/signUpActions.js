@@ -25,7 +25,7 @@ export const signupDeveloper = (userData) => {
     
     try {   
       const response = await axios.post(baseUrl + endpoint , userData);
-      console.log(response);
+      // console.log(response);
       
       dispatch(signupSuccess(response.data));
       

@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import { logout as logoutAction } from '../../../redux/actions/userActions';
+import { logout as logoutAction } from '../../../redux/actions/signInActions';
 import { useNavigate } from 'react-router-dom';
 
 export const useLogout = () => {

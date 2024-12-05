@@ -60,24 +60,18 @@ import React, { useEffect, useState } from "react";
 import { IoMdCloseCircle } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAvailableProjects } from "../../redux/actions/availableProjectActions";
-import {
-  FaArrowLeft,
-  FaCaretLeft,
-  FaCaretRight,
-  FaSpinner,
-} from "react-icons/fa6";
+import { FaArrowLeft, FaCaretLeft, FaCaretRight, FaSpinner } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import InvestModal from "./InvestModal";
 import FurtherInfoModal from "./FurtherInfoModal";
 import MeetingModal from "./MeetingModal";
+import MessageModal from "./MessageModal";
 
 const ProjectList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { loading, projects, error, totalPages } = useSelector(
-    (state) => state.availableProjects
-  );
+  const { loading, projects, error, totalPages } = useSelector((state) => state.availableProjects);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [isProceedModalOpen, setIsProceedModalOpen] = useState(false);
@@ -85,8 +79,10 @@ const ProjectList = () => {
   const [isFurtherInfoModalOpen, setIsFurtherInfoModalOpen] = useState(false);
   const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-
   const uniqueId = localStorage.getItem("uniqueId");
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [isSuccessMessage, setIsSuccessMessage] = useState(false)
 
   useEffect(() => {
     dispatch(fetchAvailableProjects(currentPage, uniqueId));
@@ -121,6 +117,23 @@ const ProjectList = () => {
     navigate(-1);
   };
 
+  const handleSuccessMessage = (successMessage) => {
+    setMessage(successMessage);
+    setIsMessageModalOpen(true);
+    setIsSuccessMessage(true); 
+  }
+
+  const handleErrorMessage = (errorMessage) => {
+    setMessage(errorMessage);
+    setIsMessageModalOpen(true);
+    setIsSuccessMessage(false); 
+  };
+
+  const closeMessageModal = () => {
+    setIsMessageModalOpen(false);
+  };
+
+
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen">
@@ -138,7 +151,7 @@ const ProjectList = () => {
   }));
 
   return (
-    <div className="p-4 h-screen bg-gray-100">
+    <div className="p-4 min-h-screen bg-gray-100">
       <div className="mb-4 flex justify-between items-center px-4">
         <h1 className="text-2xl font-semibold text-primary">Projects List</h1>
         <div className="flex items-center justify-between gap-4 w-60">
@@ -257,7 +270,7 @@ const ProjectList = () => {
                   setIsFurtherInfoModalOpen(true);
                 }}
               >
-                Request further Information
+                Request Further Information
               </button>
               <button
                 className="bg-primary text-white px-4 py-2 rounded-md"
@@ -273,18 +286,39 @@ const ProjectList = () => {
       )}
       {isInvestModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-70 flex justify-center items-center">
-          <InvestModal onClose={() => setIsInvestModalOpen(false)} />
+          <InvestModal 
+            userUniqueId={uniqueId} 
+            projectUniqueId={selectedProject.id} 
+            onClose={() => setIsInvestModalOpen(false)} 
+            onSuccess={handleSuccessMessage} 
+            onError={handleErrorMessage}
+          />
         </div>
       )}
       {isFurtherInfoModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-70 flex justify-center items-center">
-          <FurtherInfoModal onClose={() => setIsFurtherInfoModalOpen(false)} />
+          <FurtherInfoModal 
+            userUniqueId={uniqueId} 
+            projectUniqueId={selectedProject.id} 
+            onClose={() => setIsFurtherInfoModalOpen(false)} 
+            onSuccess={handleSuccessMessage} 
+            onError={handleErrorMessage}
+          />
         </div>
       )}
       {isMeetingModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-70 flex justify-center items-center">
-          <MeetingModal onClose={() => setIsMeetingModalOpen(false)} />
+          <MeetingModal 
+            userUniqueId={uniqueId} 
+            projectUniqueId={selectedProject.id} 
+            onClose={() => setIsMeetingModalOpen(false)} 
+            onSuccess={handleSuccessMessage} 
+            onError={handleErrorMessage}
+          />
         </div>
+      )}
+      {isMessageModalOpen && (
+        <MessageModal message={message} onClose={closeMessageModal}  isSuccess={isSuccessMessage}/>
       )}
     </div>
   );

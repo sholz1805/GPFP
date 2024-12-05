@@ -61,6 +61,7 @@ export const requestMeeting = (meetingData) => {
             type: REQUEST_MEETING_FAILURE,
             payload: errorMessage,
           });
+          throw new Error(errorMessage); 
       }
     };
   };
@@ -80,6 +81,7 @@ export const requestMeeting = (meetingData) => {
             type: REQUEST_INFORMATION_FAILURE,
             payload: errorMessage,
           });
+          throw new Error(errorMessage); 
       }
     };
   };
@@ -92,15 +94,17 @@ export const requestMeeting = (meetingData) => {
       try {
         const response = await axios.post(`${baseUrl}/investment/request`, infoData);
         dispatch({
-            type: REQUEST_INVESTMENT_SUCCESS,
-            payload: response.data,
-          });
+          type: REQUEST_INVESTMENT_SUCCESS,
+          payload: response.data,
+        });
+        return response.data; 
       } catch (error) {
         const errorMessage = error.response?.data?.message || error.message;
         dispatch({
-            type: REQUEST_INVESTMENT_FAILURE,
-            payload: errorMessage,
-          });
+          type: REQUEST_INVESTMENT_FAILURE,
+          payload: errorMessage,
+        });
+        throw new Error(errorMessage); 
       }
     };
   };

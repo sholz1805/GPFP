@@ -4,6 +4,7 @@ import ROUTES from "./router/routes";
 import DashboardRoutes from "./router/DashboardRoutes";
 import ScrollToTop from "./ScrollToTop";
 import ProtectedRoute from "./ProtectedRoute";
+import Login from "./pages/authentication/Login";
 
 const App = () => {
   return (
@@ -18,9 +19,10 @@ const App = () => {
             element={route.element}
           />
         ))}
-        <Route path="/*" element={<ProtectedRoute />}>
+        <Route element={<ProtectedRoute />}>
           <Route path="/*" element={<DashboardRoutes />} />
         </Route>
+        <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
   );

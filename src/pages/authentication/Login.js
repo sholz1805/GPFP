@@ -54,7 +54,6 @@ const Login = () => {
         const email = response.payload.data.email;
         const token = response.payload.data.jwt.jsonWebToken;
         const role = response.payload.data.role;
-        // console.log(response);
         localStorage.setItem('uniqueId', uniqueId)
 
         setResponse(response);

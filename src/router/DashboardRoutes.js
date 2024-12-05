@@ -6,7 +6,7 @@ import Messages from "../pages/admin/dashboard/Messages";
 import Report from "../pages/admin/dashboard/Report";
 import Investor from "../pages/admin/dashboard/Investor";
 import Developer from "../pages/admin/dashboard/Developer";
-import UploadProject from "../pages/admin/dashboard/UploadProject";
+import InvestmentTransaction from "../pages/admin/dashboard/InvestmentTransaction";
 
 const DashboardRoutes = () => {
   return (
@@ -19,7 +19,7 @@ const DashboardRoutes = () => {
           <Route path="messages" element={<Messages />} />
           <Route path="investor" element={<Investor />} />
           <Route path="developer" element={<Developer />} />
-          <Route path="upload" element={<UploadProject />} />
+          <Route path="transaction" element={<InvestmentTransaction />} />
           <Route path="report" element={<Report />} />
         </Routes>
       </main>

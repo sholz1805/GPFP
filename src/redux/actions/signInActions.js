@@ -3,6 +3,9 @@ import axios from 'axios';
 export const SIGNIN_REQUEST = 'SIGNIN_REQUEST';
 export const SIGNIN_SUCCESS = 'SIGNIN_SUCCESS';
 export const SIGNIN_FAILURE = 'SIGNIN_FAILURE';
+export const LOGOUT = 'LOGOUT';
+
+
 
 export const signinRequest = () => ({ type: SIGNIN_REQUEST });
 
@@ -14,6 +17,10 @@ export const signinSuccess = (userData) => ({
 export const signinFailure = (error) => ({
   type: SIGNIN_FAILURE,
   payload: error,
+});
+
+export const logout = () => ({
+  type: LOGOUT,
 });
 
 export const signin = (userData) => {

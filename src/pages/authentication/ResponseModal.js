@@ -23,12 +23,12 @@ const ResponseModal = ({ isOpen, toggle, message, status, isLoading }) => {
               ) : (
                 <FaExclamationCircle size={24} color="red" />
               )}
-              <p className="text-lg font-semibold text-center">
+              <p className="text-sm font-semibold text-center">
                 {status === "success"
                   ? "Successful!"
                   : "An Error Occurred"}
               </p>
-              <p className="text-gray-500 mt-2 text-center leading-tight">
+              <p className="text-gray-500 mt-2 text-sm text-center leading-tight">
                 {message}
               </p>
             </div>

@@ -402,7 +402,8 @@ const InvestorProfile = () => {
                         onChange={(e) =>
                           handleFileUpload(e, setIdentificationMeans, "identificationMeans")
                         }
-                        className="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white rounded-md"
+                        className="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0
+                      file:text-sm file:font-semibold file:bg-green-50 cursor-pointer file:text-primary hover:file:bg-secondary-100"
                       />
                       <i className="text-gray-500">
                         <AiOutlineCloudUpload />
